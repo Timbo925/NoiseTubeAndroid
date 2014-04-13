@@ -48,6 +48,7 @@ public class DisplayProfile extends Activity implements ActionBar.TabListener {
 		mSectionsPagerAdapter = new SectionsPagerAdapter(getFragmentManager());
 
 		// Set up the ViewPager with the sections adapter.
+		// ViewPager allws the user to flip left and right through pages of data
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 

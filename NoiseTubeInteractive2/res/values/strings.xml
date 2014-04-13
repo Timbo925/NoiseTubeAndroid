@@ -10,8 +10,12 @@
     <string name="button_send">Send</string>
     <string name="title_activity_display_message">My Message</string>
     <string name="title_activity_display_profile">Profile</string>
-    <string name="title_section1">Section 1</string>
+    <string name="title_section1">Stats</string>
     <string name="title_section2">Section 2</string>
     <string name="title_section3">Section 3</string>
+    <string name="title_activity_new_profile">Profile</string>
+    <string name="profile_name">Profile Name</string>
+    <string name="profile_icon">Profile Icon</string>
+    <string name="profile_line_2">Profile name of user</string>
 
 </resources>

@@ -88,7 +88,7 @@ public class MainActivity extends Activity {
 	}
 	
 	public void startProfile() {
-		Intent intent = new Intent(this, DisplayProfile.class);
+		Intent intent = new Intent(this, NewProfileActivity.class);
 		startActivity(intent);
 	}
 
