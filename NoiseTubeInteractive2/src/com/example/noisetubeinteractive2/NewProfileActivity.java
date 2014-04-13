@@ -31,42 +31,48 @@ public class NewProfileActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_display_profile_list_line1);
 
-		final ListView listview = (ListView) findViewById(R.id.profile_list); //Getting listView layout
 		textProfile = (TextView) findViewById(R.id.profile_line_line_2);
 		textProfile.setText("Timbo925");
 		System.out.println("executing GetStats");
-		new GetStats().execute(statsURL);
+		
+		//AsyncTask that gets Profile information form server
+		new GetProfile().execute(statsURL);
 	
 //		if (savedInstanceState == null) {
 //			getFragmentManager().beginTransaction()
-//					.add(R.id.container, new PlaceholderFragment()).commit();
+//				.add(R.id.container, new PlaceholderFragment()).commit();
 //		}
 	}
 	
-	private class GetStats extends AsyncTask<String, JSONObject, JSONObject> {
+	private class GetProfile extends AsyncTask<String, JSONObject, JSONObject> {
 		
 		@Override
 		protected JSONObject doInBackground(String... arg) {
 			JSONObject jsonObject = new JSONObject();
+			//Setting up the request to the server
 			HttpGet get = new HttpGet(arg[0]);
 			System.out.println("URL: " + arg[0]);
 			HttpClient client = new DefaultHttpClient();
 			HttpResponse response;
+			
 			try {
 				response = client.execute(get);
 				System.out.println("Response form GetStats: " + response.getStatusLine());
-				String jsonString = EntityUtils.toString(response.getEntity());
-				JSONObject jsonObject2 = new JSONObject(jsonString);
-				jsonObject = jsonObject2;
-				//jsonObject.getJSONObject(jsonString);
-				System.out.println("jsonObject: " + jsonObject);
-				System.out.println("userName is: " + jsonObject.optString("userName"));
+				
+				if (response.getStatusLine().getStatusCode() == 200) { //Successfull operation from server
+					String jsonString = EntityUtils.toString(response.getEntity()); // Extraction body form responseboy
+					jsonObject = new JSONObject(jsonString); // String in JSON format to a jsonObject
+					System.out.println("jsonObject: " + jsonObject);
+					return jsonObject;
+				} else {
+					return jsonObject; // In case of an error (no 200 code). null returned
+				}
+				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				System.out.println("Error in getting JSON");
 				e.printStackTrace();
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
+				System.err.println("JSON request problem");
 				e.printStackTrace();
 			}		
 			return jsonObject;
@@ -74,9 +80,14 @@ public class NewProfileActivity extends Activity {
 		
 		@Override
 		protected void onPostExecute(JSONObject jsonObject) {
-			System.out.println("onPostExecute");
-			//super.onPostExecute(jsonObject);
-			textProfile.setText(jsonObject.optString("userName"));
+			
+			//Test if object is set by the request. If null there was a bad return STATUS form the server
+			if (!jsonObject.equals(null)) {
+				textProfile.setText(jsonObject.optString("userName"));
+				System.out.println("Success with GetProfile");
+			} else {
+				System.out.println("Problem with GetProfile");
+			}
 		
 		}
 		
