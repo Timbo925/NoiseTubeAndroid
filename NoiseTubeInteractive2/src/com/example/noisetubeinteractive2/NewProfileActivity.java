@@ -24,17 +24,17 @@ import android.widget.TextView;
 public class NewProfileActivity extends Activity {
 
 	private static String statsURL = "http://192.168.1.8:3002/user/5db7088d63a6737ee272f5f1dff8ac37ede5cbef27ea8380f8d691ce59de2d1a";
-	TextView textProfile;
+	TextView textProfileUserName;
+	TextView textProfileEmail;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.fragment_display_profile_list_line1);
 
-		textProfile = (TextView) findViewById(R.id.profile_line_line_2);
-		textProfile.setText("Timbo925");
-		System.out.println("executing GetStats");
-		
+		textProfileUserName = (TextView) findViewById(R.id.profile_userName);
+		textProfileEmail = (TextView) findViewById(R.id.profile_email);
+
 		//AsyncTask that gets Profile information form server
 		new GetProfile().execute(statsURL);
 	
@@ -43,7 +43,8 @@ public class NewProfileActivity extends Activity {
 //				.add(R.id.container, new PlaceholderFragment()).commit();
 //		}
 	}
-	
+
+	//TODO Also retreive STATS to include into profile
 	private class GetProfile extends AsyncTask<String, JSONObject, JSONObject> {
 		
 		@Override
@@ -83,7 +84,8 @@ public class NewProfileActivity extends Activity {
 			
 			//Test if object is set by the request. If null there was a bad return STATUS form the server
 			if (!jsonObject.equals(null)) {
-				textProfile.setText(jsonObject.optString("userName"));
+				textProfileUserName.setText(jsonObject.optString("userName"));
+				textProfileEmail.setText(jsonObject.optString("email"));
 				System.out.println("Success with GetProfile");
 			} else {
 				System.out.println("Problem with GetProfile");

@@ -17,5 +17,14 @@
     <string name="profile_name">Profile Name</string>
     <string name="profile_icon">Profile Icon</string>
     <string name="profile_line_2">Profile name of user</string>
-
+    <string name="profile_userName">User Name</string>
+    <string name="profile_email">Email Address</string>
+	<string name="profile_exp">0/247</string>
+	<string name="profile_lvl">1</string>
+	<string name="profile_lvl_text">Level: </string>
+	<string name="profile_exp_text">Experience Points: </string>
+	<string name="profile_msr_text"># Measurements: </string>
+	<string name="profile_msr">1</string>
+	<string name="profile_time_text">Time Measured: </string>
+	<string name="profile_time">00:00:00</string>
 </resources>
