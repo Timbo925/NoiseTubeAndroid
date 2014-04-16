@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
@@ -96,7 +97,8 @@ public class MainActivity extends Activity {
 
 	public class DbResponse extends BroadcastReceiver {
 
-		private String dbLvlString = "0";
+		private int dbLvlInt = 0;
+		private int dbLvlPerInt = 100;
 		public static final String ACTION_RESP = "db_update";
 
 		@Override
@@ -106,8 +108,12 @@ public class MainActivity extends Activity {
 				FragmentManager fragmen= getFragmentManager(); 								//Fragment manager containing all the fragments
 				Fragment frag = fragmen.findFragmentById(R.id.container); 					//Find one of the fragments by its ID
 				TextView textDbLvl = (TextView) frag.getView().findViewById(R.id.db_lvl);   //Get text field inside the fragment
-				dbLvlString = intent.getStringExtra(SoundMeasurementService.PARAM_OUT_MSG); //Retrieving message from the intend by the Service 
-				textDbLvl.setText(dbLvlString); 											//Set layout to received message
+				ProgressBar progressBar = (ProgressBar) frag.getView().findViewById(R.id.progress_bar_meter);
+				dbLvlInt = intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MSG, 0);    //Retrieving message from the intend by the Service 
+				dbLvlPerInt = intent.getIntExtra(SoundMeasurementService.PARAM_OUT_PER, 0);
+				textDbLvl.setText(Integer.toString(dbLvlInt)); 								//Set layout to received message
+				progressBar.setProgress(dbLvlPerInt);
+				
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -116,7 +122,6 @@ public class MainActivity extends Activity {
 	}	
 
 	public void sendMessage(View view) {
-
 		Intent mServiceIntent;
 		mServiceIntent = new Intent(getApplicationContext(), SoundMeasurementService.class);   //Creating Intent to pass to Service
 		mServiceIntent.putExtra(SoundMeasurementService.PARAM_IN_MSG, "This it the IN_MSG");   //Adding some dataString to the Intent to pass to service

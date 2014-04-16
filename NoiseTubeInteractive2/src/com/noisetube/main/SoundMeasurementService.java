@@ -1,37 +1,50 @@
 package com.noisetube.main;
 
-import com.noisetube.main.MainActivity.DbResponse;
-
 import android.app.IntentService;
 import android.content.Intent;
-import android.hardware.Camera.ShutterCallback;
+import android.os.SystemClock;
 import android.util.Log;
+
+import com.noisetube.main.MainActivity.DbResponse;
 
 public class SoundMeasurementService extends IntentService {
 
 	private int dbLvl= 55;
-	private static final String dbAppend = " db";
-	public static final String PARAM_IN_MSG = "inMsg";
-	public static final String PARAM_OUT_MSG = "outMsg";
-	//TODO create soundmeter class
+	public static final String PARAM_IN_MSG = "inMsg SoundMeasurementService";
+	public static final String PARAM_OUT_MSG = "outMsg db Level SoundMeasurementService";
+	public static final String PARAM_OUT_PER = "outMsg db Percent SoundMeasurementService";
+	private boolean loop = true;
+	private SoundMeasurement soundMeasurement = new SoundMeasurement();
 
 	public SoundMeasurementService() {
 		super("SoundMeasurementService");
 	}
+	
 
-	 
 	@Override
 	protected void onHandleIntent(Intent workIntent) {
 
 		Log.v("onHandleIntent", "Handeling intent");
-		String msg = workIntent.getStringExtra(PARAM_IN_MSG);
-
-		Intent broadcatIntent = new Intent();
-		broadcatIntent.setAction(DbResponse.ACTION_RESP);
-		broadcatIntent.addCategory(Intent.CATEGORY_DEFAULT);
-		broadcatIntent.putExtra(PARAM_OUT_MSG, dbLvl + dbAppend);
-		sendBroadcast(broadcatIntent);
 		
+		soundMeasurement.start();
+		Log.v("onHnadleIntent", "soundMeasurement started");
+		
+		String msg = workIntent.getStringExtra(PARAM_IN_MSG); //Retreving message from the intent
+		
+		while (loop) {
+			SystemClock.sleep(1000);
+			soundMeasurement.measure();
+			
+			Intent broadcatIntent = new Intent();
+			broadcatIntent.setAction(DbResponse.ACTION_RESP);
+			broadcatIntent.addCategory(Intent.CATEGORY_DEFAULT);
+			broadcatIntent.putExtra(PARAM_OUT_MSG, soundMeasurement.getDbLevel());
+			broadcatIntent.putExtra(PARAM_OUT_PER, soundMeasurement.getDbPercent());
+			sendBroadcast(broadcatIntent);
+		}
+		
+		
+		soundMeasurement.stop();
 		this.stopSelf();
 		Log.v("onHandleIntent", "Ending onHandleIntent");
 	}
