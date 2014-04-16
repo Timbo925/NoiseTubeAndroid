@@ -18,10 +18,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
         android:gravity="center"
-        android:text="@string/profile_userName"
         android:textAlignment="textEnd"
         android:textSize="10pt"
-        android:textStyle="bold" />
+        android:textStyle="bold" 
+        android:hint="user name"/>
 
     <TextView
         android:id="@+id/profile_email"
@@ -29,10 +29,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:gravity="center"
-        android:text="@string/profile_email"
         android:textAlignment="textEnd"
         android:textSize="8pt"
-        android:textStyle="italic" />
+        android:textStyle="italic"
+        android:hint="email adress" />
 
     <LinearLayout
         android:layout_width="fill_parent"

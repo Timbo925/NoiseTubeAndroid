@@ -7,7 +7,7 @@
     <string name="action_measurement">Measure</string>
     <string name="action_profile">Profile</string>
     <string name="edit_message">Enter a message</string>
-    <string name="button_send">Send</string>
+    <string name="button_go">Go</string>
     <string name="title_activity_display_message">My Message</string>
     <string name="title_activity_display_profile">Profile</string>
     <string name="title_section1">Stats</string>
@@ -27,4 +27,5 @@
 	<string name="profile_msr">1</string>
 	<string name="profile_time_text">Time Measured: </string>
 	<string name="profile_time">00:00:00</string>
+	<string name="no_db_lvl">Not measuring</string>
 </resources>

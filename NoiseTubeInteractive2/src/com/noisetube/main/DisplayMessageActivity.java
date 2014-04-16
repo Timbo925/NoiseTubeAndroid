@@ -1,4 +1,6 @@
-package com.example.noisetubeinteractive2;
+package com.noisetube.main;
+
+import com.example.noisetubeinteractive2.R;
 
 import android.app.Activity;
 import android.app.Fragment;

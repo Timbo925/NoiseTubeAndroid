@@ -1,6 +1,8 @@
-package com.example.noisetubeinteractive2;
+package com.noisetube.main;
 
 import java.util.Locale;
+
+import com.example.noisetubeinteractive2.R;
 
 import android.app.Activity;
 import android.app.ActionBar;
