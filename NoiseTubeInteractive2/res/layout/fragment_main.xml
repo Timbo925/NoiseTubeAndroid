@@ -15,12 +15,23 @@
         android:id="@+id/db_lvl"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12sp"
+        android:layout_marginBottom="4sp"
         android:gravity="center"
         android:hint="@string/no_db_lvl"
         android:textColor="#FFBB33"
-        android:textSize="14pt"
+        android:textSize="18pt"
         android:textStyle="bold" />
+    
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:gravity="center"
+        android:hint="@string/location_default"
+        android:textColor="@android:color/darker_gray"
+        android:textSize="8pt"
+        android:textStyle="italic" />
 
     <LinearLayout
         android:layout_width="fill_parent"
@@ -40,6 +51,8 @@
             android:onClick="sendMessage"
             android:paddingLeft="8dp"
             android:paddingRight="8dp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/btn_blue_small"
             android:text="@string/button_go" />
 
         <View

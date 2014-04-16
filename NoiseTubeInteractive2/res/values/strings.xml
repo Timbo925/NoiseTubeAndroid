@@ -28,4 +28,5 @@
 	<string name="profile_time_text">Time Measured: </string>
 	<string name="profile_time">00:00:00</string>
 	<string name="no_db_lvl">Not measuring</string>
+	<string name="location_default">(50.86408;4.417720)</string>
 </resources>
