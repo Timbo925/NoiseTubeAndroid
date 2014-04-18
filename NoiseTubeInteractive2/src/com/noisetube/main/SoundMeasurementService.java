@@ -12,14 +12,15 @@ import com.noisetube.main.MainActivity.DbResponse;
 
 public class SoundMeasurementService extends IntentService {
 
-	private int dbLvl= 55;
 	public static final String PARAM_IN_MSG = "inMsg SoundMeasurementService";
 	public static final String PARAM_OUT_MSG = "outMsg db Level SoundMeasurementService";
 	public static final String PARAM_OUT_PER = "outMsg db Percent SoundMeasurementService";
 	public static final String PARAM_OUT_AVG = "outMsg db Average SoundMeasurementService";
 	public static final String PARAM_OUT_MIN = "outMsg db Minimum SoundMeasurementService";
 	public static final String PARAM_OUT_MAX = "outMsg db Maximum SoundMeasurementService";
-	private boolean loop = true;
+	public static final String PARAM_COMMAND = "command";
+	public static final String PARAM_STOP_COMMAND = "stop";
+	private boolean isStoped = false;
 	private SoundMeasurement soundMeasurement = new SoundMeasurement();
 	
 
@@ -27,17 +28,31 @@ public class SoundMeasurementService extends IntentService {
 		super("SoundMeasurementService");
 	}
 	
-
+	/**
+	 * To stop Intentservice start service with extra ("command","stop")
+	 */
 	@Override
-	protected void onHandleIntent(Intent workIntent) {
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		if (intent.hasExtra("command")) {
+			isStoped = intent.getStringExtra(PARAM_COMMAND).equals(PARAM_STOP_COMMAND);
+		}
+		return super.onStartCommand(intent, flags, startId);
+	}
+	
+	@Override
+	protected void onHandleIntent(Intent intent) {
 
-		Log.v("onHandleIntent", "Started onHandleIntent");
-		//soundMeasurement.start();
-		//Log.v("onHnadleIntent", "soundMeasurement started");
+		Log.v("onHandleIntent", "Started serice");
+
+		// Make sure while loop is only executed when this is the original service not the service started to stop
+		// the original servcie by changing the parameter
+		if (intent.hasExtra(PARAM_COMMAND)) {
+			isStoped = intent.getStringExtra(PARAM_COMMAND).equals(PARAM_STOP_COMMAND);
+			Log.v("onHandleIntent", "STOP Command received");
+			return; 
+		}
 		
-		String msg = workIntent.getStringExtra(PARAM_IN_MSG); //Retreving message from the intent
-		
-		while (loop) {
+		while (!isStoped) {
 			soundMeasurement.measure();	
 			
 			//Creating broadca
@@ -52,8 +67,8 @@ public class SoundMeasurementService extends IntentService {
 			sendBroadcast(broadcastIntent);
 		}
 		
-		//soundMeasurement.stop();
+		//TODO steps when stop measuring
 		this.stopSelf();
-		Log.v("onHandleIntent", "Ending onHandleIntent");
+		Log.v("onHandleIntent", "Closing service");
 	}
 }

@@ -67,8 +67,9 @@ public class DbMeter {
 				//dbPercent = 100;
 			} else {
 				dbLevel = (int) db;
-				//Log.d("measure() 1", "db=[" + lvl + "], percent=[" + dbPercent + "] ,amplitude=[" + amplitude + "]");
-				Log.d("measure() 2", "db=[" + (int) db  + "],average=[" + average + "] ,pressure=[" + pressure + "]");
+		
+				
+				//Log.d("measure() 2", "db=[" + (int) db  + "],average=[" + average + "] ,pressure=[" + pressure + "]");
 			}
 		}
 		return dbLevel;

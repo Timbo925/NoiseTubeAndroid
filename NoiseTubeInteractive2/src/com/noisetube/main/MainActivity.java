@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 		//Hiding Stop button
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		//buttonStop.setVisibility(View.GONE);
-		
+
 		//Adding fragmets to the mainActivity
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
@@ -119,12 +119,13 @@ public class MainActivity extends Activity {
 				TextView textDbMin = (TextView) frag.getView().findViewById(R.id.home_min_db);
 				TextView textDbAvg = (TextView) frag.getView().findViewById(R.id.home_avg_db);
 				ProgressBar progressBar = (ProgressBar) frag.getView().findViewById(R.id.progress_bar_meter);
+				
 				textDbMax.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MAX, 0)) + dbText);
 				textDbMin.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MIN, 0)) + dbText);
 				textDbAvg.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_AVG, 0)) + dbText);
-				textDbLvl.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MSG, 0))  + dbText); 								//Set layout to received message
+				textDbLvl.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MSG, 0))  + dbText);
 				progressBar.setProgress(100 - intent.getIntExtra(SoundMeasurementService.PARAM_OUT_PER, 0));
-				
+
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -132,12 +133,14 @@ public class MainActivity extends Activity {
 		}
 	}	
 
+	private Intent mServiceIntent;
+	
 	public void startMeasuring(View view) {
-		Intent mServiceIntent;
+		//Intent mServiceIntent;
 		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
-		
+
 		chronometer.start();
 		buttonStop.setVisibility(View.VISIBLE);
 		buttonStart.setVisibility(View.GONE);
@@ -146,14 +149,17 @@ public class MainActivity extends Activity {
 		startService(mServiceIntent); 														   //Starting service with the intent
 
 	}
-	
+
 	public void stopMeasuring(View view) {
-		//TODO stopMeasuring button
+		//TODO 
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
 		
 		buttonStart.setVisibility(View.VISIBLE);
 		buttonStop.setVisibility(View.GONE);
+		
+		mServiceIntent.putExtra(SoundMeasurementService.PARAM_COMMAND,SoundMeasurementService.PARAM_STOP_COMMAND);
+		startService(mServiceIntent);
 	}
 
 	public void startProfile() {
