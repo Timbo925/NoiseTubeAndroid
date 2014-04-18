@@ -7,7 +7,8 @@
     <string name="action_measurement">Measure</string>
     <string name="action_profile">Profile</string>
     <string name="edit_message">Enter a message</string>
-    <string name="button_go">Go</string>
+    <string name="home_button_go">Go</string>
+    <string name="home_button_stop">Stop</string>
     <string name="title_activity_display_message">My Message</string>
     <string name="title_activity_display_profile">Profile</string>
     <string name="title_section1">Stats</string>

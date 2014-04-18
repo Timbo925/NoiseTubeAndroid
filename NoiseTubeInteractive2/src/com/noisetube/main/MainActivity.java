@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -39,6 +40,10 @@ public class MainActivity extends Activity {
 		dbResponse = new DbResponse();
 		registerReceiver(dbResponse, filter);
 
+		//Hiding Stop button
+		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
+		//buttonStop.setVisibility(View.GONE);
+		
 		//Adding fragmets to the mainActivity
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
@@ -127,14 +132,28 @@ public class MainActivity extends Activity {
 		}
 	}	
 
-	public void sendMessage(View view) {
+	public void startMeasuring(View view) {
 		Intent mServiceIntent;
-		Chronometer chronometer = (Chronometer) getFragmentManager().findFragmentById(R.id.container).getView().findViewById(R.id.home_chrono);
+		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
+		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
+		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
+		
 		chronometer.start();
+		buttonStop.setVisibility(View.VISIBLE);
+		buttonStart.setVisibility(View.GONE);
 		mServiceIntent = new Intent(getApplicationContext(), SoundMeasurementService.class);   //Creating Intent to pass to Service
 		mServiceIntent.putExtra(SoundMeasurementService.PARAM_IN_MSG, "This it the IN_MSG");   //Adding some dataString to the Intent to pass to service
 		startService(mServiceIntent); 														   //Starting service with the intent
 
+	}
+	
+	public void stopMeasuring(View view) {
+		//TODO stopMeasuring button
+		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
+		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
+		
+		buttonStart.setVisibility(View.VISIBLE);
+		buttonStop.setVisibility(View.GONE);
 	}
 
 	public void startProfile() {
