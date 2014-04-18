@@ -31,27 +31,28 @@ public class SoundMeasurementService extends IntentService {
 	@Override
 	protected void onHandleIntent(Intent workIntent) {
 
-		Log.v("onHandleIntent", "Handeling intent");
-		soundMeasurement.start();
-		
-		Log.v("onHnadleIntent", "soundMeasurement started");
+		Log.v("onHandleIntent", "Started onHandleIntent");
+		//soundMeasurement.start();
+		//Log.v("onHnadleIntent", "soundMeasurement started");
 		
 		String msg = workIntent.getStringExtra(PARAM_IN_MSG); //Retreving message from the intent
 		
 		while (loop) {
 			soundMeasurement.measure();	
-			Intent broadcatIntent = new Intent();
-			broadcatIntent.setAction(DbResponse.ACTION_RESP);
-			broadcatIntent.addCategory(Intent.CATEGORY_DEFAULT);
-			broadcatIntent.putExtra(PARAM_OUT_MSG, soundMeasurement.getDbLevel());
-			broadcatIntent.putExtra(PARAM_OUT_PER, soundMeasurement.getDbPercent());
-			broadcatIntent.putExtra(PARAM_OUT_AVG, soundMeasurement.getAvgDb());
-			broadcatIntent.putExtra(PARAM_OUT_MAX, soundMeasurement.getMaxDb());
-			broadcatIntent.putExtra(PARAM_OUT_MIN, soundMeasurement.getMinDb());
-			sendBroadcast(broadcatIntent);
+			
+			//Creating broadca
+			Intent broadcastIntent = new Intent();
+			broadcastIntent.setAction(DbResponse.ACTION_RESP);
+			broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
+			broadcastIntent.putExtra(PARAM_OUT_MSG, soundMeasurement.getDbLast());
+			broadcastIntent.putExtra(PARAM_OUT_PER, soundMeasurement.getDbPercent());
+			broadcastIntent.putExtra(PARAM_OUT_AVG, soundMeasurement.getDbAvg());
+			broadcastIntent.putExtra(PARAM_OUT_MAX, soundMeasurement.getDbMax());
+			broadcastIntent.putExtra(PARAM_OUT_MIN, soundMeasurement.getDbMin());
+			sendBroadcast(broadcastIntent);
 		}
 		
-		soundMeasurement.stop();
+		//soundMeasurement.stop();
 		this.stopSelf();
 		Log.v("onHandleIntent", "Ending onHandleIntent");
 	}

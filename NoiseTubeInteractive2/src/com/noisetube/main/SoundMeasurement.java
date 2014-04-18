@@ -1,138 +1,109 @@
 package com.noisetube.main;
 
-import java.io.File;
-
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import android.util.Log;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SoundMeasurement {
-	public static final int MINIMUM_DB = 10;
-	public static final int MAXIMUM_DB = 100;
-	private static final int sampleRate = 44100;
-	
-	private int dbLevel;
-	private int dbPercent;
-	
-	private AudioRecord mRecorder;
-	private File mRecording;
-	private short[] mBuffer;
-	private final String startRecordingLabel = "Start recording";
-	private final String stopRecordingLabel = "Stop recording";
-	private boolean mIsRecording = false;
-	private int bufferSize;
-	
-	private int Counter =  0;
-	private int AvgDb = 0;
-	private int MaxDb = 0;
-	private int MinDb = 100;
 
-	public int getMaxDb() {
-		return MaxDb;
+	private int dbAvg = 0;
+	private int dbMax = 0;
+	private int dbMin = 100;
+	private int dbLast = 0;
+	private int dbPercent;
+	private DbMeter dbMeter = new DbMeter();
+	private List<Integer> dbList = new ArrayList<Integer>();
+	private int counter = 0;
+
+	
+	//TODO post() function to server with all measurements
+	
+	public void reset() {
+		dbAvg = 0;
+		dbMax = 0;
+		dbMin = 100;
+		dbPercent = 0;
+		counter = 0;
+		dbList.clear();
 	}
-	public void setMaxDb(int maxDb) {
-		MaxDb = maxDb;
+	
+	
+	public void measure() {
+		int db = dbMeter.measure();  //Returns new db level measured
+		dbList.add(db);
+		updateStats(db);
+
+		//TODO Retreive location
 	}
-	public SoundMeasurement() {
+
+	private void updateStats(int db) {
 		
+		//No update to the stats when DbMeter didn't return a good value;
+		if (db != 0) {
+			
+			//Update regular amount of measurements + last db measurement
+			counter++;
+			dbLast = db;
+			
+			//Calculation of percentage based on range DbMeter 
+			double spread = DbMeter.MAXIMUM_DB-DbMeter.MINIMUM_DB;
+			double spreadMulti = 100.0/spread;
+			dbPercent = (int) (spreadMulti * (db - DbMeter.MINIMUM_DB));
+			
+			//Update Average/Min/Max
+			dbAvg = ((dbAvg * (counter - 1)) + db) / counter ;
+			if (db > dbMax) {dbMax = db;}
+			if (db < dbMin) {dbMin = db;}
+		}	
 	}
-	public int getDbLevel() {
-		return dbLevel;
+
+
+	/**
+	 * @return the dbAvg
+	 */
+	public int getDbAvg() {
+		return dbAvg;
 	}
-	public void setDbLevel(int dbLevel) {
-		this.dbLevel = dbLevel;
+
+
+	/**
+	 * @return the dbMax
+	 */
+	public int getDbMax() {
+		return dbMax;
 	}
+
+
+	/**
+	 * @return the dbMin
+	 */
+	public int getDbMin() {
+		return dbMin;
+	}
+
+
+	/**
+	 * @return the dbLast
+	 */
+	public int getDbLast() {
+		return dbLast;
+	}
+
+
+	/**
+	 * @return the dbPercent
+	 */
 	public int getDbPercent() {
 		return dbPercent;
 	}
-	public void setDbPercent(int dbPercent) {
-		this.dbPercent = dbPercent;
-	}
-	
-	public int getCounter() {
-		return Counter;
-	}
-	public void setCounter(int counter) {
-		Counter = counter;
-	}
-	public int getAvgDb() {
-		return AvgDb;
-	}
-	public void setAvgDb(int avgDb) {
-		AvgDb = avgDb;
-	}
-	public int getMinDb() {
-		return MinDb;
-	}
-	public void setMinDb(int minDb) {
-		MinDb = minDb;
-	}
-	public void start() {
-		bufferSize = AudioRecord.getMinBufferSize(44100, AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT);
-		mBuffer = new short[bufferSize*4];
-		mRecorder = new AudioRecord(MediaRecorder.AudioSource.MIC, 44100, AudioFormat.CHANNEL_IN_MONO,AudioFormat.ENCODING_PCM_16BIT, bufferSize*4);
-		//mRecorder.startRecording();
-	}
-	
-	public void measure() {
-		short[] output = new short[bufferSize];
-		double average = 0.0;
-		mRecorder.startRecording();
-		double sum = 0;
-		int readSize = mRecorder.read(mBuffer, 0, mBuffer.length);   //Reading the buffer that is currently stored
-		mRecorder.stop();
-		
-		for (int i = 0; i < readSize; i++) {
-			sum += mBuffer[i] * mBuffer[i];
-			average += Math.abs(mBuffer[i]);
-		}
-		//System.out.println(average);
-		//System.out.println(readSize);
-		if (readSize > 0) {
-			//Old Calculations
-			//TODO remove this 
-			final double amplitude = sum / readSize;
-			int lvl = ((int) Math.sqrt(amplitude)); //TODO make it possible to calibrate this value
-			lvl = (int) (20* Math.log10(lvl)); // A-weighting
-			
-			
-			//New Calcutations
-			double x = average/((bufferSize*4)-1);
-		    double db=0;
-		    // calculating the pascal pressure based on the idea that the max amplitude (between 0 and 32767) is 
-		    // relative to the pressure
-		    double pressure = x/51805.5336; //the value 51805.5336 can be derived from asuming that x=32767=0.6325 Pa and x=1 = 0.00002 Pa (the reference value)
-		    db = (20 * Math.log10(pressure/0.00002));
 
-			if (db < MINIMUM_DB) {
-				dbLevel = -10001;
-				dbPercent = 0;
-			} else if (db > MAXIMUM_DB) {
-				dbLevel = -10000;
-				dbPercent = 100;
-			} else {
-				dbLevel = (int) db;
-				double spread = MAXIMUM_DB-MINIMUM_DB;
-				double spreadMulti = 100.0/spread;
-				dbPercent = (int) (spreadMulti * (db - MINIMUM_DB));
-				Counter++;
-				AvgDb = ((AvgDb * (Counter - 1)) + dbLevel)/Counter;
-				if (dbLevel > MaxDb ) {
-					MaxDb = dbLevel;
-				}
-				if (dbLevel < MinDb) {
-					MinDb = dbLevel;
-				}
-				
-				//Log.d("measure() 1", "db=[" + lvl + "], percent=[" + dbPercent + "] ,amplitude=[" + amplitude + "]");
-				Log.d("measure() 2", "db=[" + (int) db + "], percent=[" + dbPercent + "],average=[" + average + "] ,pressure=[" + pressure + "]");
-			}
-		}
+
+	/**
+	 * @return the dbMeter
+	 */
+	public DbMeter getDbMeter() {
+		return dbMeter;
 	}
-	
-	public void stop() {
-		//mRecorder.stop();
-	}
+
+
 	
 }
