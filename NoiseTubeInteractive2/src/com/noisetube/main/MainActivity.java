@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Chronometer;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -99,6 +100,7 @@ public class MainActivity extends Activity {
 
 		private int dbLvlInt = 0;
 		private int dbLvlPerInt = 100;
+		private String dbText= " db";
 		public static final String ACTION_RESP = "db_update";
 
 		@Override
@@ -108,11 +110,15 @@ public class MainActivity extends Activity {
 				FragmentManager fragmen= getFragmentManager(); 								//Fragment manager containing all the fragments
 				Fragment frag = fragmen.findFragmentById(R.id.container); 					//Find one of the fragments by its ID
 				TextView textDbLvl = (TextView) frag.getView().findViewById(R.id.db_lvl);   //Get text field inside the fragment
+				TextView textDbMax = (TextView) frag.getView().findViewById(R.id.home_max_db);
+				TextView textDbMin = (TextView) frag.getView().findViewById(R.id.home_min_db);
+				TextView textDbAvg = (TextView) frag.getView().findViewById(R.id.home_avg_db);
 				ProgressBar progressBar = (ProgressBar) frag.getView().findViewById(R.id.progress_bar_meter);
-				dbLvlInt = intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MSG, 0);    //Retrieving message from the intend by the Service 
-				dbLvlPerInt = intent.getIntExtra(SoundMeasurementService.PARAM_OUT_PER, 0);
-				textDbLvl.setText(Integer.toString(dbLvlInt)); 								//Set layout to received message
-				progressBar.setProgress(dbLvlPerInt);
+				textDbMax.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MAX, 0)) + dbText);
+				textDbMin.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MIN, 0)) + dbText);
+				textDbAvg.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_AVG, 0)) + dbText);
+				textDbLvl.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MSG, 0))  + dbText); 								//Set layout to received message
+				progressBar.setProgress(100 - intent.getIntExtra(SoundMeasurementService.PARAM_OUT_PER, 0));
 				
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -123,6 +129,8 @@ public class MainActivity extends Activity {
 
 	public void sendMessage(View view) {
 		Intent mServiceIntent;
+		Chronometer chronometer = (Chronometer) getFragmentManager().findFragmentById(R.id.container).getView().findViewById(R.id.home_chrono);
+		chronometer.start();
 		mServiceIntent = new Intent(getApplicationContext(), SoundMeasurementService.class);   //Creating Intent to pass to Service
 		mServiceIntent.putExtra(SoundMeasurementService.PARAM_IN_MSG, "This it the IN_MSG");   //Adding some dataString to the Intent to pass to service
 		startService(mServiceIntent); 														   //Starting service with the intent
