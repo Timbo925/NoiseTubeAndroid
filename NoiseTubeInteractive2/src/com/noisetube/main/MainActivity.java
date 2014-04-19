@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -140,7 +141,8 @@ public class MainActivity extends Activity {
 		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
-
+		
+		chronometer.setBase(SystemClock.elapsedRealtime());
 		chronometer.start();
 		buttonStop.setVisibility(View.VISIBLE);
 		buttonStart.setVisibility(View.GONE);
@@ -154,10 +156,13 @@ public class MainActivity extends Activity {
 		//TODO 
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
+		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
 		
 		buttonStart.setVisibility(View.VISIBLE);
 		buttonStop.setVisibility(View.GONE);
-		
+		chronometer.stop();
+
+		//Posting same intent with this parameters will stop both services
 		mServiceIntent.putExtra(SoundMeasurementService.PARAM_COMMAND,SoundMeasurementService.PARAM_STOP_COMMAND);
 		startService(mServiceIntent);
 	}

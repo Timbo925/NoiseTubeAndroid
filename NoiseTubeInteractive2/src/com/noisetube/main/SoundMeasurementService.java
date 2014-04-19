@@ -18,10 +18,11 @@ public class SoundMeasurementService extends IntentService {
 	public static final String PARAM_OUT_AVG = "outMsg db Average SoundMeasurementService";
 	public static final String PARAM_OUT_MIN = "outMsg db Minimum SoundMeasurementService";
 	public static final String PARAM_OUT_MAX = "outMsg db Maximum SoundMeasurementService";
+	public static final String PARAM_OUT_TIME = "outMsg total time SoundMeasurementService";
 	public static final String PARAM_COMMAND = "command";
 	public static final String PARAM_STOP_COMMAND = "stop";
 	private boolean isStoped = false;
-	private SoundMeasurement soundMeasurement = new SoundMeasurement();
+	private SoundMeasurement soundMeasurement;
 	
 
 	public SoundMeasurementService() {
@@ -51,7 +52,7 @@ public class SoundMeasurementService extends IntentService {
 			Log.v("onHandleIntent", "STOP Command received");
 			return; 
 		}
-		
+		soundMeasurement = new SoundMeasurement();
 		while (!isStoped) {
 			soundMeasurement.measure();	
 			
@@ -64,8 +65,11 @@ public class SoundMeasurementService extends IntentService {
 			broadcastIntent.putExtra(PARAM_OUT_AVG, soundMeasurement.getDbAvg());
 			broadcastIntent.putExtra(PARAM_OUT_MAX, soundMeasurement.getDbMax());
 			broadcastIntent.putExtra(PARAM_OUT_MIN, soundMeasurement.getDbMin());
+			broadcastIntent.putExtra(PARAM_OUT_TIME, soundMeasurement.getTime());
 			sendBroadcast(broadcastIntent);
 		}
+		
+		
 		
 		//TODO steps when stop measuring
 		this.stopSelf();

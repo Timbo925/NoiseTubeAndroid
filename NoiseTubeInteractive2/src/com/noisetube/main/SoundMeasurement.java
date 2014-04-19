@@ -1,7 +1,10 @@
 package com.noisetube.main;
 
+import java.security.acl.LastOwnerException;
 import java.util.ArrayList;
 import java.util.List;
+
+import android.os.SystemClock;
 
 public class SoundMeasurement {
 
@@ -13,6 +16,8 @@ public class SoundMeasurement {
 	private DbMeter dbMeter = new DbMeter();
 	private List<Integer> dbList = new ArrayList<Integer>();
 	private int counter = 0;
+	private long startTime = SystemClock.elapsedRealtime();
+	private long endTime = SystemClock.elapsedRealtime();
 
 	
 	//TODO post() function to server with all measurements
@@ -24,6 +29,8 @@ public class SoundMeasurement {
 		dbPercent = 0;
 		counter = 0;
 		dbList.clear();
+		startTime = SystemClock.elapsedRealtime();
+		endTime = SystemClock.elapsedRealtime();
 	}
 	
 	
@@ -43,6 +50,7 @@ public class SoundMeasurement {
 			//Update regular amount of measurements + last db measurement
 			counter++;
 			dbLast = db;
+			endTime = SystemClock.elapsedRealtime();
 			
 			//Calculation of percentage based on range DbMeter 
 			double spread = DbMeter.MAXIMUM_DB-DbMeter.MINIMUM_DB;
@@ -57,6 +65,9 @@ public class SoundMeasurement {
 	}
 
 
+	public long getTime() {
+		return endTime - startTime;
+	}
 	/**
 	 * @return the dbAvg
 	 */
