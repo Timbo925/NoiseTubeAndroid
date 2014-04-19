@@ -12,7 +12,7 @@ public class SoundMeasurement {
 	private int dbMax = 0;
 	private int dbMin = 100;
 	private int dbLast = 0;
-	private int dbPercent;
+	private double dbPercent;
 	private DbMeter dbMeter = new DbMeter();
 	private List<Integer> dbList = new ArrayList<Integer>();
 	private int counter = 0;
@@ -103,7 +103,7 @@ public class SoundMeasurement {
 	/**
 	 * @return the dbPercent
 	 */
-	public int getDbPercent() {
+	public double getDbPercent() {
 		return dbPercent;
 	}
 
