@@ -1,19 +1,20 @@
 package com.noisetube.main;
 
-import java.security.acl.LastOwnerException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.os.SystemClock;
 
-public class SoundMeasurement {
+public class SoundMeasurement implements Serializable {
 
+	private static final long serialVersionUID = 2901906860850977163L;
 	private int dbAvg = 0;
 	private int dbMax = 0;
 	private int dbMin = 100;
 	private int dbLast = 0;
 	private double dbPercent;
-	private DbMeter dbMeter = new DbMeter();
+	//private DbMeter dbMeter = new DbMeter();
 	private List<Integer> dbList = new ArrayList<Integer>();
 	private int counter = 0;
 	private long startTime = SystemClock.elapsedRealtime();
@@ -35,6 +36,7 @@ public class SoundMeasurement {
 	
 	
 	public void measure() {
+		DbMeter dbMeter = new DbMeter();
 		int db = dbMeter.measure();  //Returns new db level measured
 		dbList.add(db);
 		updateStats(db);
@@ -109,12 +111,106 @@ public class SoundMeasurement {
 
 
 	/**
-	 * @return the dbMeter
+	 * @return the dbList
 	 */
-	public DbMeter getDbMeter() {
-		return dbMeter;
+	public List<Integer> getDbList() {
+		return dbList;
 	}
 
 
+	/**
+	 * @param dbList the dbList to set
+	 */
+	public void setDbList(List<Integer> dbList) {
+		this.dbList = dbList;
+	}
+
+
+	/**
+	 * @return the counter
+	 */
+	public int getCounter() {
+		return counter;
+	}
+
+
+	/**
+	 * @param counter the counter to set
+	 */
+	public void setCounter(int counter) {
+		this.counter = counter;
+	}
+
+
+	/**
+	 * @return the startTime
+	 */
+	public long getStartTime() {
+		return startTime;
+	}
+
+
+	/**
+	 * @param startTime the startTime to set
+	 */
+	public void setStartTime(long startTime) {
+		this.startTime = startTime;
+	}
+
+
+	/**
+	 * @return the endTime
+	 */
+	public long getEndTime() {
+		return endTime;
+	}
+
+
+	/**
+	 * @param endTime the endTime to set
+	 */
+	public void setEndTime(long endTime) {
+		this.endTime = endTime;
+	}
+
+
+	/**
+	 * @param dbAvg the dbAvg to set
+	 */
+	public void setDbAvg(int dbAvg) {
+		this.dbAvg = dbAvg;
+	}
+
+
+	/**
+	 * @param dbMax the dbMax to set
+	 */
+	public void setDbMax(int dbMax) {
+		this.dbMax = dbMax;
+	}
+
+
+	/**
+	 * @param dbMin the dbMin to set
+	 */
+	public void setDbMin(int dbMin) {
+		this.dbMin = dbMin;
+	}
+
+
+	/**
+	 * @param dbLast the dbLast to set
+	 */
+	public void setDbLast(int dbLast) {
+		this.dbLast = dbLast;
+	}
+
+
+	/**
+	 * @param dbPercent the dbPercent to set
+	 */
+	public void setDbPercent(double dbPercent) {
+		this.dbPercent = dbPercent;
+	}
 	
 }

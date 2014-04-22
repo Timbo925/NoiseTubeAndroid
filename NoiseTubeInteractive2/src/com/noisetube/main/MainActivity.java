@@ -1,7 +1,5 @@
 package com.noisetube.main;
 
-import com.example.noisetubeinteractive2.R;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -9,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -20,15 +17,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.example.noisetubeinteractive2.R;
+import com.google.gson.Gson;
 
 public class MainActivity extends Activity {
 
 	public final static String EXTRA_MESSAGE = "com.example.noisetubeinteractive2.EXTRA_MESSAGE";
 	private DbResponse dbResponse;
+	private FinalDbResponse finalDbResponse;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +39,11 @@ public class MainActivity extends Activity {
 		filter.addCategory(Intent.CATEGORY_DEFAULT);
 		dbResponse = new DbResponse();
 		registerReceiver(dbResponse, filter);
+		
+		IntentFilter filter2 = new IntentFilter(FinalDbResponse.ACTION_RESP);
+		filter2.addCategory(Intent.CATEGORY_DEFAULT);
+		finalDbResponse = new FinalDbResponse();
+		registerReceiver(finalDbResponse, filter2);
 
 		//Hiding Stop button
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
@@ -133,6 +137,21 @@ public class MainActivity extends Activity {
 
 		}
 	}	
+	
+	/**
+	 * @author Tim
+	 * BroadcastReceiver for for last broadcast by the Service. Will start starScore()
+	 */
+	public class FinalDbResponse extends BroadcastReceiver {
+
+		public static final String ACTION_RESP = "db_final braodcast";
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			SoundMeasurement soundMeasurement = (SoundMeasurement) intent.getExtras().getSerializable(SoundMeasurementService.PARAM_OUT_SOUNDM);
+			startScore(soundMeasurement);
+		}
+	}	
 
 	private Intent mServiceIntent;
 	
@@ -152,6 +171,10 @@ public class MainActivity extends Activity {
 
 	}
 
+	/**
+	 * Action when stop button in clicked. This will stop the running SoundMeasurementService
+	 * @param view
+	 */
 	public void stopMeasuring(View view) {
 		//TODO 
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
@@ -164,7 +187,15 @@ public class MainActivity extends Activity {
 
 		//Posting same intent with this parameters will stop both services
 		mServiceIntent.putExtra(SoundMeasurementService.PARAM_COMMAND,SoundMeasurementService.PARAM_STOP_COMMAND);
-		startService(mServiceIntent);
+		startService(mServiceIntent);			
+	}
+	
+	/**
+	 * @param soundMeasurement : Object status when broadcast was done.
+	 */
+	public void startScore(SoundMeasurement soundMeasurement) {
+		Gson gson = new Gson();
+		System.out.println(gson.toJson(soundMeasurement).toString());
 	}
 
 	public void startProfile() {

@@ -5,7 +5,6 @@ import java.io.File;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.util.Log;
 
 public class DbMeter {
 
