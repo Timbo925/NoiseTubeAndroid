@@ -1,5 +1,18 @@
 package com.noisetube.main;
 
+import java.io.IOException;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -7,6 +20,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -39,7 +53,7 @@ public class MainActivity extends Activity {
 		filter.addCategory(Intent.CATEGORY_DEFAULT);
 		dbResponse = new DbResponse();
 		registerReceiver(dbResponse, filter);
-		
+
 		IntentFilter filter2 = new IntentFilter(FinalDbResponse.ACTION_RESP);
 		filter2.addCategory(Intent.CATEGORY_DEFAULT);
 		finalDbResponse = new FinalDbResponse();
@@ -124,7 +138,7 @@ public class MainActivity extends Activity {
 				TextView textDbMin = (TextView) frag.getView().findViewById(R.id.home_min_db);
 				TextView textDbAvg = (TextView) frag.getView().findViewById(R.id.home_avg_db);
 				ProgressBar progressBar = (ProgressBar) frag.getView().findViewById(R.id.progress_bar_meter);
-				
+
 				textDbMax.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MAX, 0)) + dbText);
 				textDbMin.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MIN, 0)) + dbText);
 				textDbAvg.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_AVG, 0)) + dbText);
@@ -137,7 +151,7 @@ public class MainActivity extends Activity {
 
 		}
 	}	
-	
+
 	/**
 	 * @author Tim
 	 * BroadcastReceiver for for last broadcast by the Service. Will start starScore()
@@ -149,18 +163,23 @@ public class MainActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			SoundMeasurement soundMeasurement = (SoundMeasurement) intent.getExtras().getSerializable(SoundMeasurementService.PARAM_OUT_SOUNDM);
-			startScore(soundMeasurement);
+			
+			Gson gson = new Gson();
+			System.out.println(gson.toJson(soundMeasurement).toString());
+			
+			PostSoundMeasurement postSoundMeasurement = new PostSoundMeasurement();
+			postSoundMeasurement.execute(soundMeasurement);
 		}
 	}	
 
 	private Intent mServiceIntent;
-	
+
 	public void startMeasuring(View view) {
 		//Intent mServiceIntent;
 		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
-		
+
 		chronometer.setBase(SystemClock.elapsedRealtime());
 		chronometer.start();
 		buttonStop.setVisibility(View.VISIBLE);
@@ -180,7 +199,7 @@ public class MainActivity extends Activity {
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
 		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
-		
+
 		buttonStart.setVisibility(View.VISIBLE);
 		buttonStop.setVisibility(View.GONE);
 		chronometer.stop();
@@ -189,18 +208,70 @@ public class MainActivity extends Activity {
 		mServiceIntent.putExtra(SoundMeasurementService.PARAM_COMMAND,SoundMeasurementService.PARAM_STOP_COMMAND);
 		startService(mServiceIntent);			
 	}
-	
-	/**
-	 * @param soundMeasurement : Object status when broadcast was done.
-	 */
-	public void startScore(SoundMeasurement soundMeasurement) {
-		Gson gson = new Gson();
-		System.out.println(gson.toJson(soundMeasurement).toString());
-	}
+
 
 	public void startProfile() {
 		Intent intent = new Intent(this, NewProfileActivity.class);
 		startActivity(intent);
+	}
+
+	public class PostSoundMeasurement extends AsyncTask<SoundMeasurement, Void, JSONObject> {
+		// <Prams excecution, Progress background published, Result >
+		@Override
+		protected JSONObject doInBackground(SoundMeasurement... arg) {
+			JSONObject jsonObject = new JSONObject();
+			String url = "http://nuNogNiet";
+			//Setting up the request to the server
+			HttpPost post = new HttpPost(url);
+			post.setHeader("Content-type", "application/json");
+
+			Gson gson = new Gson();
+
+			HttpClient client = new DefaultHttpClient();
+			HttpResponse response;
+
+			try {
+				gson.toJson(arg);
+				StringEntity stringEntity = new StringEntity(gson.toString());
+				stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
+				post.setEntity(stringEntity);
+
+				response = client.execute(post);
+				System.out.println("Response form GetStats: " + response.getStatusLine());
+
+				if (response.getStatusLine().getStatusCode() == 200) { 					//Successfull operation from server
+					String jsonString = EntityUtils.toString(response.getEntity()); 	// Extraction body form responseboy
+					jsonObject = new JSONObject(jsonString); 							// String in JSON format to a jsonObject
+					System.out.println("jsonObject: " + jsonObject);
+					return jsonObject;
+				} else {
+					jsonObject = null;
+					return jsonObject; // In case of an error (no 200 code). null returned
+				}
+
+			} catch (IOException e) {
+				System.out.println("Error in getting JSON");
+				e.printStackTrace();
+				jsonObject = null;
+			} catch (JSONException e) {
+				System.err.println("JSON request problem");
+				e.printStackTrace();
+				jsonObject = null;
+			}		
+			return jsonObject;
+		}
+
+		@Override
+		protected void onPostExecute(JSONObject jsonObject) { //Access to the GUI treath
+
+			//Test if object is set by the request. If null there was a bad return STATUS form the server
+			if (jsonObject == null) {
+				System.out.println("Problem with Posting Measurement");
+			} else {
+				System.out.println("Success with Posting Measurement");
+				
+			}
+		}			
 	}
 
 }
