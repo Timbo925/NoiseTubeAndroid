@@ -3,6 +3,7 @@ package com.noisetube.main;
 import java.io.IOException;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -11,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.example.noisetubeinteractive2.R;
+import com.google.gson.JsonObject;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -47,55 +49,34 @@ public class NewProfileActivity extends Activity {
 	}
 
 	//TODO Also retreive STATS to include into profile
-	private class GetProfile extends AsyncTask<String, JSONObject, JSONObject> {
+	private class GetProfile extends AsyncTask<String, Void, JsonResponse> {
 		
 		@Override
-		protected JSONObject doInBackground(String... arg) {
-			JSONObject jsonObject = new JSONObject();
-			//Setting up the request to the server
-			HttpGet get = new HttpGet(arg[0]);
-			System.out.println("URL: " + arg[0]);
-			HttpClient client = new DefaultHttpClient();
-			HttpResponse response;
-			
+		protected JsonResponse doInBackground(String... arg) {
+			ServerConnection serverConnection = (ServerConnection) getApplication();
+			JsonResponse jsonResponse = new JsonResponse();
 			try {
-				response = client.execute(get);
-				System.out.println("Response form GetStats: " + response.getStatusLine());
+				jsonResponse = serverConnection.get(arg[0]);
 				
-				if (response.getStatusLine().getStatusCode() == 200) { //Successfull operation from server
-					String jsonString = EntityUtils.toString(response.getEntity()); // Extraction body form responseboy
-					jsonObject = new JSONObject(jsonString); // String in JSON format to a jsonObject
-					System.out.println("jsonObject: " + jsonObject);
-					return jsonObject;
-				} else {
-					return jsonObject; // In case of an error (no 200 code). null returned
-				}
-				
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
 			} catch (IOException e) {
-				System.out.println("Error in getting JSON");
 				e.printStackTrace();
-			} catch (JSONException e) {
-				System.err.println("JSON request problem");
-				e.printStackTrace();
-			}		
-			return jsonObject;
+			}
+			
+			return jsonResponse;
 		}
 		
 		@Override
-		protected void onPostExecute(JSONObject jsonObject) {
-			
-			//Test if object is set by the request. If null there was a bad return STATUS form the server
-			if (!jsonObject.equals(null)) {
-				textProfileUserName.setText(jsonObject.optString("userName"));
-				textProfileEmail.setText(jsonObject.optString("email"));
-				System.out.println("Success with GetProfile");
+		protected void onPostExecute(JsonResponse jsonResponse) { // Function has access to the UI treat
+			JsonObject jsonObject = new JsonObject();
+			if (jsonResponse.hasErrors()) {
+				textProfileUserName.setText("Bob");
+				textProfileEmail.setText("Bob@gmail.com");
 			} else {
-				System.out.println("Problem with GetProfile");
+				
 			}
-		
-		}
-		
-		
+		}	
 	}
 	
 	@Override

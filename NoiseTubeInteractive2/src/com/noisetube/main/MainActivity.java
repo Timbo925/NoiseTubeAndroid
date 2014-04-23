@@ -3,6 +3,7 @@ package com.noisetube.main;
 import java.io.IOException;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -215,61 +216,24 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
-	public class PostSoundMeasurement extends AsyncTask<SoundMeasurement, Void, JSONObject> {
+	public class PostSoundMeasurement extends AsyncTask<SoundMeasurement, Void, JsonResponse> {
 		// <Prams excecution, Progress background published, Result >
 		@Override
-		protected JSONObject doInBackground(SoundMeasurement... arg) {
-			JSONObject jsonObject = new JSONObject();
-			String url = "http://nuNogNiet";
-			//Setting up the request to the server
-			HttpPost post = new HttpPost(url);
-			post.setHeader("Content-type", "application/json");
-
-			Gson gson = new Gson();
-
-			HttpClient client = new DefaultHttpClient();
-			HttpResponse response;
-
-			try {
-				gson.toJson(arg);
-				StringEntity stringEntity = new StringEntity(gson.toString());
-				stringEntity.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE, "application/json"));
-				post.setEntity(stringEntity);
-
-				response = client.execute(post);
-				System.out.println("Response form GetStats: " + response.getStatusLine());
-
-				if (response.getStatusLine().getStatusCode() == 200) { 					//Successfull operation from server
-					String jsonString = EntityUtils.toString(response.getEntity()); 	// Extraction body form responseboy
-					jsonObject = new JSONObject(jsonString); 							// String in JSON format to a jsonObject
-					System.out.println("jsonObject: " + jsonObject);
-					return jsonObject;
-				} else {
-					jsonObject = null;
-					return jsonObject; // In case of an error (no 200 code). null returned
-				}
-
-			} catch (IOException e) {
-				System.out.println("Error in getting JSON");
-				e.printStackTrace();
-				jsonObject = null;
-			} catch (JSONException e) {
-				System.err.println("JSON request problem");
-				e.printStackTrace();
-				jsonObject = null;
-			}		
-			return jsonObject;
+		protected JsonResponse doInBackground(SoundMeasurement... arg) {
+			String url = "http://nuNogNiet";		
+			ServerConnection serverConnection = (ServerConnection) getApplication();
+			JsonResponse jsonResponse = new JsonResponse();
+			Gson gson = new Gson();		
+			jsonResponse = serverConnection.post(url, gson.toJson(arg[0]).toString());
+			return jsonResponse;		
 		}
 
 		@Override
-		protected void onPostExecute(JSONObject jsonObject) { //Access to the GUI treath
-
-			//Test if object is set by the request. If null there was a bad return STATUS form the server
-			if (jsonObject == null) {
-				System.out.println("Problem with Posting Measurement");
+		protected void onPostExecute(JsonResponse jsonResponse) { //Access to the GUI tread
+			if (jsonResponse.hasErrors()) {
+				System.out.println("Errors Put Points");
 			} else {
-				System.out.println("Success with Posting Measurement");
-				
+				System.out.println("Success Put Point");
 			}
 		}			
 	}
