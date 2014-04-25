@@ -8,7 +8,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.noisetubeinteractive2.PostResult$PlaceholderFragment" >
 
-
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
@@ -29,32 +28,31 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:text="@string/post_points" />
-            
-             <TextView
+
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:text="@string/post_multi_loc" />
-             
-              <TextView
+
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:text="@string/post_multi_time" />
-              
-               <TextView
+
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:text="@string/post_multi_bonus" />
-               
-                <TextView
+
+            <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left"
                 android:text="@string/post_points_total"
                 android:textStyle="bold" />
-
         </LinearLayout>
 
         <LinearLayout
@@ -64,7 +62,41 @@
             android:layout_weight=".5"
             android:orientation="vertical" >
 
+            <TextView
+                android:id="@+id/post_points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:hint="0" />
 
+            <TextView
+                android:id="@+id/post_multi_loc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:hint="0" />
+
+            <TextView
+                android:id="@+id/post_multi_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:hint="0" />
+
+            <TextView
+                android:id="@+id/post_multi_bonus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:hint="0" />
+
+            <TextView
+                android:id="@+id/post_points_total"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:hint="0" />
         </LinearLayout>
     </LinearLayout>
+
 </RelativeLayout>

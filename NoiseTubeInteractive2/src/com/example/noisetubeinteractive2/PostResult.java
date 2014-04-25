@@ -77,7 +77,18 @@ public class PostResult extends Activity {
 			points = (Points) getActivity().getIntent().getExtras().getSerializable(Points.POINTS);
 			System.out.println("onCreateView inside fragments: " + points);
 			
-			 
+			textPoints = (TextView) getView().findViewById(R.id.post_points);
+			textMultiBonus = (TextView) getView().findViewById(R.id.post_multi_bonus);
+			textMultiLoc = (TextView) getView().findViewById(R.id.post_multi_loc);
+			textMultiTime = (TextView) getView().findViewById(R.id.post_multi_time);
+			textPointsTotal = (TextView) getView().findViewById(R.id.post_points_total);
+			
+			textPoints.setText(points.getPoints());
+			textMultiBonus.setText(Double.toString(points.getMultiplierSpecial()));
+			textMultiLoc.setText(Double.toString(points.getMultiplierLocation()));
+			textMultiTime.setText(Double.toString(points.getMultiplierTime()));
+			textPointsTotal.setText(Float.toString(points.getPointsTotal()));
+			
 			return rootView;
 		}
 	}

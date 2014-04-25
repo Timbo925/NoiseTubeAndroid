@@ -18,6 +18,9 @@ public class Points implements Serializable {
 	public static final String POINTS = "POINTS";
 	
 	
+	public long getPointsTotal() {
+		return Math.round( points*multiplierLocation*multiplierSpecial*multiplierTime);
+	}
 	/**
 	 * @return the points
 	 */
