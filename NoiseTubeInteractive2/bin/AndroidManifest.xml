@@ -10,17 +10,19 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
     <application
+        android:name="com.noisetube.main.ServerConnection"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:name="com.noisetube.main.ServerConnection" >
+        android:theme="@style/AppTheme" >
         <activity
             android:name="com.noisetube.main.MainActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -45,8 +47,19 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.noisetubeinteractive2.MainActivity" />
         </activity>
-		
-		<service android:name="com.noisetube.main.SoundMeasurementService" android:exported="false"/>
+
+        <service
+            android:name="com.noisetube.main.SoundMeasurementService"
+            android:exported="false" />
+
+        <activity
+            android:name="com.example.noisetubeinteractive2.PostResult"
+            android:label="@string/title_activity_post_result"
+            android:parentActivityName="com.noisetube.main.MainActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.noisetube.main.MainActivity" />
+        </activity>
     </application>
-	
+
 </manifest>

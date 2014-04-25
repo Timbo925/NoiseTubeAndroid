@@ -35,8 +35,10 @@ import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.noisetubeinteractive2.PostResult;
 import com.example.noisetubeinteractive2.R;
 import com.google.gson.Gson;
+import com.noisetube.models.Points;
 
 public class MainActivity extends Activity {
 
@@ -232,8 +234,25 @@ public class MainActivity extends Activity {
 		protected void onPostExecute(JsonResponse jsonResponse) { //Access to the GUI tread
 			if (jsonResponse.hasErrors()) {
 				System.out.println("Errors Put Points");
+				//TODO Use real points response
+				Points points = new Points();
+				points.setMultiplierLocation(2);
+				points.setMultiplierSpecial(1);
+				points.setMultiplierTime(1);
+				points.setPoints(222);
+				points.setOldExp(200);
+				points.setNewExp(644);
+				points.setOldLvl(2);
+				points.setNewLvl(2);
+				points.setOldMax(800);
+				points.setNewMax(800);
+				
+				Intent intent = new Intent(getApplicationContext(), PostResult.class);
+				intent.putExtra(Points.POINTS, points);
+				startActivity(intent);
 			} else {
 				System.out.println("Success Put Point");
+			
 			}
 		}			
 	}

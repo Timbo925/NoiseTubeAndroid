@@ -1,16 +1,21 @@
 package com.noisetube.models;
 
-public class Points {
+import java.io.Serializable;
+
+public class Points implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 	private int points;
-	private int multiplierLocation;
-	private int multiplierTime;
-	private int multiplierSpecial;
+	private double multiplierLocation;
+	private double multiplierTime;
+	private double multiplierSpecial;
 	private int oldLvl;
 	private int newLvl;
 	private int OldExp;
 	private int OldMax;
 	private int NewExp;
 	private int NewMax;
+	public static final String POINTS = "POINTS";
 	
 	
 	/**
@@ -28,37 +33,37 @@ public class Points {
 	/**
 	 * @return the multiplierLocation
 	 */
-	public int getMultiplierLocation() {
+	public double getMultiplierLocation() {
 		return multiplierLocation;
 	}
 	/**
 	 * @param multiplierLocation the multiplierLocation to set
 	 */
-	public void setMultiplierLocation(int multiplierLocation) {
+	public void setMultiplierLocation(double multiplierLocation) {
 		this.multiplierLocation = multiplierLocation;
 	}
 	/**
 	 * @return the multiplierTime
 	 */
-	public int getMultiplierTime() {
+	public double getMultiplierTime() {
 		return multiplierTime;
 	}
 	/**
 	 * @param multiplierTime the multiplierTime to set
 	 */
-	public void setMultiplierTime(int multiplierTime) {
+	public void setMultiplierTime(double multiplierTime) {
 		this.multiplierTime = multiplierTime;
 	}
 	/**
 	 * @return the multiplierSpecial
 	 */
-	public int getMultiplierSpecial() {
+	public double getMultiplierSpecial() {
 		return multiplierSpecial;
 	}
 	/**
 	 * @param multiplierSpecial the multiplierSpecial to set
 	 */
-	public void setMultiplierSpecial(int multiplierSpecial) {
+	public void setMultiplierSpecial(double multiplierSpecial) {
 		this.multiplierSpecial = multiplierSpecial;
 	}
 	/**
