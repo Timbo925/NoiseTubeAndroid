@@ -23,9 +23,8 @@ public class PostResult extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post_result);
 		
-		points = (Points) this.getIntent().getExtras().getSerializable(Points.POINTS);
-		System.out.println("onCreate: " + points);
-		
+		//points = (Points) this.getIntent().getExtras().getSerializable(Points.POINTS);
+
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
 					.add(R.id.container, new PointsFragment()).commit();
@@ -57,12 +56,12 @@ public class PostResult extends Activity {
 	 */
 	public static class PointsFragment extends Fragment {
 		
-		Points points;
-		TextView textPoints;
-		TextView textMultiLoc;
-		TextView textMultiTime;
-		TextView textMultiBonus;
-		TextView textPointsTotal;
+		private Points points;
+		private TextView textPoints;
+		private TextView textMultiLoc;
+		private TextView textMultiTime;
+		private TextView textMultiBonus;
+		private TextView textPointsTotal;
 		
 		public PointsFragment() {
 		}
@@ -75,15 +74,15 @@ public class PostResult extends Activity {
 			
 
 			points = (Points) getActivity().getIntent().getExtras().getSerializable(Points.POINTS);
-			System.out.println("onCreateView inside fragments: " + points);
+			System.out.println(points);
 			
-			textPoints = (TextView) getView().findViewById(R.id.post_points);
-			textMultiBonus = (TextView) getView().findViewById(R.id.post_multi_bonus);
-			textMultiLoc = (TextView) getView().findViewById(R.id.post_multi_loc);
-			textMultiTime = (TextView) getView().findViewById(R.id.post_multi_time);
-			textPointsTotal = (TextView) getView().findViewById(R.id.post_points_total);
+			textPoints = (TextView) rootView.findViewById(R.id.post_points);
+			textMultiBonus = (TextView) rootView.findViewById(R.id.post_multi_bonus);
+			textMultiLoc = (TextView) rootView.findViewById(R.id.post_multi_loc);
+			textMultiTime = (TextView) rootView.findViewById(R.id.post_multi_time);
+			textPointsTotal = (TextView) rootView.findViewById(R.id.post_points_total);
 			
-			textPoints.setText(points.getPoints());
+			textPoints.setText(Integer.toString(points.getPoints()));
 			textMultiBonus.setText(Double.toString(points.getMultiplierSpecial()));
 			textMultiLoc.setText(Double.toString(points.getMultiplierLocation()));
 			textMultiTime.setText(Double.toString(points.getMultiplierTime()));

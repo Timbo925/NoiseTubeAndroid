@@ -141,6 +141,18 @@ public class Points implements Serializable {
 	public void setNewMax(int newMax) {
 		NewMax = newMax;
 	}
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Points [points=" + points + ", multiplierLocation="
+				+ multiplierLocation + ", multiplierTime=" + multiplierTime
+				+ ", multiplierSpecial=" + multiplierSpecial + ", oldLvl="
+				+ oldLvl + ", newLvl=" + newLvl + ", OldExp=" + OldExp
+				+ ", OldMax=" + OldMax + ", NewExp=" + NewExp + ", NewMax="
+				+ NewMax + "]";
+	}
 	
 	
 }
