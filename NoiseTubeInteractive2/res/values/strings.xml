@@ -40,5 +40,6 @@
     <string name="post_multi_time">Location Multiplier</string>
     <string name="post_multi_bonus">Bonus Multiplier</string>
     <string name="post_points_total">Total Points</string>
+    <string name="post_lvl">Level</string>
 
 </resources>
