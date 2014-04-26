@@ -1,10 +1,12 @@
 package com.example.noisetubeinteractive2;
 
+import com.noisetube.main.NewProfileActivity;
 import com.noisetube.models.Points;
 
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -45,15 +47,27 @@ public class PostResult extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
-		if (id == R.id.action_settings) {
+		switch (id) {
+		case R.id.action_settings:
+			return true; 
+		case android.R.id.home:
+			System.out.println("clicked home");
+			onBackPressed();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
+	
+	public void startLeaderboard(View v) {
+		Intent intent = new Intent(this, LeaderboardActivity.class);
+		startActivity(intent);
+	}
+	
+	public void startHome(View v) {
+		onBackPressed();
+	}
+	
 	public static class PointsFragment extends Fragment {
 		
 		private Points points;
@@ -69,10 +83,8 @@ public class PostResult extends Activity {
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_post_result,
-					container, false);
+			View rootView = inflater.inflate(R.layout.fragment_post_result,container, false);
 			
-
 			points = (Points) getActivity().getIntent().getExtras().getSerializable(Points.POINTS);
 			System.out.println(points);
 			
@@ -89,7 +101,6 @@ public class PostResult extends Activity {
 			textPointsTotal.setText(Float.toString(points.getPointsTotal()));
 			
 			return rootView;
-		}
+		}	
 	}
-
 }

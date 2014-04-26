@@ -60,6 +60,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.noisetube.main.MainActivity" />
         </activity>
+        <activity
+            android:name="com.example.noisetubeinteractive2.LeaderboardActivity"
+            android:label="@string/title_activity_leaderboard"
+            android:parentActivityName="com.example.noisetubeinteractive2.PostResult" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.noisetubeinteractive2.PostResult" />
+        </activity>
     </application>
 
 </manifest>

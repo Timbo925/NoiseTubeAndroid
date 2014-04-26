@@ -1,4 +1,4 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,133 +8,15 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.noisetubeinteractive2.PostResult$PlaceholderFragment" >
 
-    <LinearLayout
-        android:id="@+id/post_layout_points"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/card2"
-        android:baselineAligned="false"
-        android:orientation="horizontal" >
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
         <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:layout_weight=".5"
-            android:orientation="vertical" >
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="@string/post_points" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="@string/post_multi_loc" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="@string/post_multi_time" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="@string/post_multi_bonus" />
-
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="left"
-                android:text="@string/post_points_total"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:layout_weight=".5"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/post_points"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:hint="0" />
-
-            <TextView
-                android:id="@+id/post_multi_loc"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:hint="0" />
-
-            <TextView
-                android:id="@+id/post_multi_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:hint="0" />
-
-            <TextView
-                android:id="@+id/post_multi_bonus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:hint="0" />
-
-            <TextView
-                android:id="@+id/post_points_total"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:hint="0" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/post_layout_points"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/card2"
-        android:orientation="vertical" >
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="5dp"
-            android:gravity="center"
-            android:text="Progress"
-            android:textSize="9pt"
-            android:textStyle="bold" />
-
-        <ProgressBar
-            android:id="@+id/post_progressbar"
-            style="@android:style/Widget.ProgressBar.Horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="10dp"
-            android:indeterminate="false"
-            android:progress="40" />
-
-        <TextView
-            android:id="@+id/post_progress_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="688/1132"
-            android:textStyle="italic" />
-
-        <LinearLayout
+            android:id="@+id/post_layout_points"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@drawable/card2"
             android:baselineAligned="false"
             android:orientation="horizontal" >
 
@@ -149,7 +31,32 @@
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
-                    android:text="@string/post_lvl" />
+                    android:text="@string/post_points" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="@string/post_multi_loc" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="@string/post_multi_time" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="@string/post_multi_bonus" />
+
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:text="@string/post_points_total"
+                    android:textStyle="bold" />
             </LinearLayout>
 
             <LinearLayout
@@ -160,12 +67,140 @@
                 android:orientation="vertical" >
 
                 <TextView
-                    android:id="@+id/post_lvl"
+                    android:id="@+id/post_points"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:hint="0" />
+
+                <TextView
+                    android:id="@+id/post_multi_loc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:hint="0" />
+
+                <TextView
+                    android:id="@+id/post_multi_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:hint="0" />
+
+                <TextView
+                    android:id="@+id/post_multi_bonus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:hint="0" />
+
+                <TextView
+                    android:id="@+id/post_points_total"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:hint="0" />
             </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/post_layout_progress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_layout_points"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/card2"
+            android:orientation="vertical" >
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:gravity="center"
+                android:text="Progress"
+                android:textSize="9pt"
+                android:textStyle="bold" />
+
+            <ProgressBar
+                android:id="@+id/post_progressbar"
+                style="@android:style/Widget.ProgressBar.Horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="10dp"
+                android:indeterminate="false"
+                android:progress="40" />
+
+            <TextView
+                android:id="@+id/post_progress_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="688/1132"
+                android:textStyle="italic" />
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:baselineAligned="false"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp"
+                    android:layout_weight=".5"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="left"
+                        android:text="@string/post_lvl" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_margin="4dp"
+                    android:layout_weight=".5"
+                    android:orientation="vertical" >
+
+                    <TextView
+                        android:id="@+id/post_lvl"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:hint="0" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/post_layout_progress"
+            android:orientation="vertical"
+            android:paddingTop="5dp" >
+
+            <Button
+                android:id="@+id/post_home"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_blue_small"
+                android:gravity="center"
+                android:onClick="startHome"
+                android:text="Home"
+                android:textColor="#FFFFFF" />
+
+            <Button
+                android:id="@+id/post_leaderboard"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_blue_small"
+                android:gravity="center"
+                android:onClick="startLeaderboard"
+                android:text="Leaderboard"
+                android:textColor="#FFFFFF" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</ScrollView>
