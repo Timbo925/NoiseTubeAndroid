@@ -1,25 +1,31 @@
 package com.example.noisetubeinteractive2;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
-import android.app.Activity;
 import android.app.ActionBar;
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.support.v13.app.FragmentPagerAdapter;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.noisetube.models.UserLeaderboard;
+
 public class LeaderboardActivity extends Activity implements
-		ActionBar.TabListener {
+ActionBar.TabListener {
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -56,12 +62,12 @@ public class LeaderboardActivity extends Activity implements
 		// tab. We can also use ActionBar.Tab#select() to do this if we have
 		// a reference to the Tab.
 		mViewPager
-				.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-					@Override
-					public void onPageSelected(int position) {
-						actionBar.setSelectedNavigationItem(position);
-					}
-				});
+		.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
+			@Override
+			public void onPageSelected(int position) {
+				actionBar.setSelectedNavigationItem(position);
+			}
+		});
 
 		// For each of the sections in the app, add a tab to the action bar.
 		for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
@@ -78,7 +84,7 @@ public class LeaderboardActivity extends Activity implements
 	public void onBackPressed() {
 		finish();
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
@@ -101,7 +107,7 @@ public class LeaderboardActivity extends Activity implements
 			onBackPressed();
 			return true;
 		}
-		
+
 		return super.onOptionsItemSelected(item);
 	}
 
@@ -138,8 +144,11 @@ public class LeaderboardActivity extends Activity implements
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a PlaceholderFragment (defined as a static inner class
 			// below).
-			return PlaceholderFragment.newInstance(position + 1);
-		}
+			if (position == 0) {
+				return new ScoreLeaderboardFragment();
+			} else {
+				return PlaceholderFragment.newInstance(position + 1);
+			}}
 
 		@Override
 		public int getCount() {
@@ -162,6 +171,69 @@ public class LeaderboardActivity extends Activity implements
 		}
 	}
 
+	public static class ScoreLeaderboardFragment extends Fragment {
+		
+		private List<UserLeaderboard> users = new ArrayList<UserLeaderboard>();
+
+		@Override
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_leaderboard_score,container, false);
+
+			populateListView(rootView);
+
+			return rootView;
+		}
+
+		private void populateListView(View rootView) {
+			// Create list of items
+			// TODO retreive correct users from the API
+			for (int i = 0;i < 8; i++) {
+				users.add(new UserLeaderboard("Timbo", 200));
+				users.add(new UserLeaderboard("Jobo", 188));
+				users.add(new UserLeaderboard("Monique", 100));		
+			}
+
+			
+			String[] myItems = {"Blue", "Green", "Purple" , "Red"};
+			// Build Adapter
+			ArrayAdapter<UserLeaderboard> adapter = new MyListAdapter();
+			
+			//ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.fragment_leaderboard_score_item, myItems);
+			//Configure the list view
+			ListView listView = (ListView)  rootView.findViewById(R.id.leaderboard_listview_score);
+			listView.setAdapter(adapter);
+		}
+		
+		private class MyListAdapter extends ArrayAdapter<UserLeaderboard> {
+			public MyListAdapter() {
+				super(getActivity(), R.layout.fragment_leaderboard_score_item, users);
+			}
+
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				
+				// Make sure we have a view to inflate
+				View itemView = convertView;
+				if (itemView == null) {
+					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+					itemView = inflater.inflate(R.layout.fragment_leaderboard_score_item, parent, false);
+				}
+				
+				//Selecting correct user from the arraylist
+				UserLeaderboard userLeaderboard = users.get(position); 
+				
+				//Filling the view
+				TextView textUserName = (TextView) itemView.findViewById(R.id.leaderboard_username);
+				TextView textScore = (TextView) itemView.findViewById(R.id.leaderboard_points);
+				
+				textUserName.setText(userLeaderboard.getUserName());
+				textScore.setText(Integer.toString(userLeaderboard.getPoints()));
+				return itemView;
+			}
+			
+			
+		}
+	}
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */

@@ -30,6 +30,11 @@ public class UserLeaderboard implements Serializable {
 	public void setPoints(int points) {
 		this.points = points;
 	}
+	public UserLeaderboard(String userName, int points) {
+		super();
+		this.userName = userName;
+		this.points = points;
+	}
 	
 	
 }
