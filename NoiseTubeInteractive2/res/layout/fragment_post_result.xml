@@ -200,6 +200,16 @@
                 android:onClick="startLeaderboard"
                 android:text="Leaderboard"
                 android:textColor="#FFFFFF" />
+            
+            <Button
+                android:id="@+id/post_badges"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_blue_small"
+                android:gravity="center"
+                android:onClick="startBadges"
+                android:text="Badges"
+                android:textColor="#FFFFFF" />
         </LinearLayout>
     </RelativeLayout>
 

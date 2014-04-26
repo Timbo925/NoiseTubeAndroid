@@ -42,5 +42,6 @@
     <string name="post_points_total">Total Points</string>
     <string name="post_lvl">Level</string>
     <string name="title_activity_leaderboard">Leaderboard</string>
+    <string name="title_activity_badges">BadgesActivity</string>
 
 </resources>

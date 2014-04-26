@@ -68,6 +68,11 @@ public class PostResult extends Activity {
 		onBackPressed();
 	}
 	
+	public void startBadges(View v) {
+		Intent intent = new Intent(this, BadgesActivity.class);
+		startActivity(intent);
+	}
+	
 	public static class PointsFragment extends Fragment {
 		
 		private Points points;

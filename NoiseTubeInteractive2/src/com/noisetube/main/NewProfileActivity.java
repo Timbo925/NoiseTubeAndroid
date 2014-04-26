@@ -11,11 +11,13 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.example.noisetubeinteractive2.BadgesActivity;
 import com.example.noisetubeinteractive2.R;
 import com.google.gson.JsonObject;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -98,22 +100,6 @@ public class NewProfileActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_new_profile,container, false);
-			return rootView;
-		}
-	}
 	
 	public static class ProfileFragment extends Fragment {
 		
@@ -122,6 +108,11 @@ public class NewProfileActivity extends Activity {
 			View rootView = inflater.inflate(R.layout.fragment_new_profile, container, false);
 			return rootView;
 		}
+	}
+	
+	public void startBadges(View v) {
+		Intent intent = new Intent(this, BadgesActivity.class);
+		startActivity(intent);
 	}
 
 }
