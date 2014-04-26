@@ -22,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.noisetube.models.LeaderboardType;
 import com.noisetube.models.UserLeaderboard;
 
 public class LeaderboardActivity extends Activity implements
@@ -142,13 +143,19 @@ ActionBar.TabListener {
 		@Override
 		public Fragment getItem(int position) {
 			// getItem is called to instantiate the fragment for the given page.
-			// Return a PlaceholderFragment (defined as a static inner class
+			// Return a ScoreLeaderboardFragment (defined as a static inner class
 			// below).
-			if (position == 0) {
-				return new ScoreLeaderboardFragment();
-			} else {
-				return PlaceholderFragment.newInstance(position + 1);
-			}}
+
+			switch (position) {
+			case 0:
+				return ScoreLeaderboardFragment.newInstance(LeaderboardType.SCORE);
+			case 1:
+				return ScoreLeaderboardFragment.newInstance(LeaderboardType.LEVEL);
+			case 2:
+				return ScoreLeaderboardFragment.newInstance(LeaderboardType.AMOUNT);
+			}
+			return new ScoreLeaderboardFragment();
+		}
 
 		@Override
 		public int getCount() {
@@ -172,8 +179,32 @@ ActionBar.TabListener {
 	}
 
 	public static class ScoreLeaderboardFragment extends Fragment {
-		
+
 		private List<UserLeaderboard> users = new ArrayList<UserLeaderboard>();
+		private boolean populated = false;
+
+		public static final String TYPE = "leaderboard_type";
+
+		/**
+		 * Default constructor
+		 */
+		public ScoreLeaderboardFragment() {	
+		}
+
+
+		/**
+		 * @param type - Type will beside the kind of leaderboard loaded from server
+		 * @return - fragment with argumesnt added
+		 */
+		public static ScoreLeaderboardFragment newInstance(LeaderboardType type) {
+			ScoreLeaderboardFragment fragment = new ScoreLeaderboardFragment();
+			Bundle args = new Bundle();
+			args.putSerializable(TYPE, type);
+			fragment.setArguments(args);
+			return fragment;
+		}
+
+
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -187,23 +218,26 @@ ActionBar.TabListener {
 		private void populateListView(View rootView) {
 			// Create list of items
 			// TODO retreive correct users from the API
-			for (int i = 0;i < 8; i++) {
-				users.add(new UserLeaderboard("Timbo", 200));
-				users.add(new UserLeaderboard("Jobo", 188));
-				users.add(new UserLeaderboard("Monique", 100));		
+			if (!populated) {
+				populated = true;
+				LeaderboardType type = (LeaderboardType) getArguments().getSerializable(TYPE);
+				System.out.println("Get Type: " + type);
+				for (int i = 0;i < 8; i++) {
+					users.add(new UserLeaderboard("Timbo", 22*(9-i)));
+					users.add(new UserLeaderboard("Jobo", 23*(9-i)));
+					users.add(new UserLeaderboard("Monique", 24*(9-i)));		
+				}
+
 			}
 
-			
-			String[] myItems = {"Blue", "Green", "Purple" , "Red"};
-			// Build Adapter
+			// Build Adapter with custom view reslolver
 			ArrayAdapter<UserLeaderboard> adapter = new MyListAdapter();
-			
-			//ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), R.layout.fragment_leaderboard_score_item, myItems);
+
 			//Configure the list view
 			ListView listView = (ListView)  rootView.findViewById(R.id.leaderboard_listview_score);
 			listView.setAdapter(adapter);
 		}
-		
+
 		private class MyListAdapter extends ArrayAdapter<UserLeaderboard> {
 			public MyListAdapter() {
 				super(getActivity(), R.layout.fragment_leaderboard_score_item, users);
@@ -211,64 +245,27 @@ ActionBar.TabListener {
 
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
-				
-				// Make sure we have a view to inflate
+
+				// Make sure we have a view to inflate because for the fist element we dont have this view
 				View itemView = convertView;
 				if (itemView == null) {
 					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
 					itemView = inflater.inflate(R.layout.fragment_leaderboard_score_item, parent, false);
 				}
-				
+
 				//Selecting correct user from the arraylist
 				UserLeaderboard userLeaderboard = users.get(position); 
-				
+
 				//Filling the view
 				TextView textUserName = (TextView) itemView.findViewById(R.id.leaderboard_username);
 				TextView textScore = (TextView) itemView.findViewById(R.id.leaderboard_points);
-				
+
 				textUserName.setText(userLeaderboard.getUserName());
 				textScore.setText(Integer.toString(userLeaderboard.getPoints()));
 				return itemView;
 			}
-			
-			
+
+
 		}
 	}
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-		/**
-		 * The fragment argument representing the section number for this
-		 * fragment.
-		 */
-		private static final String ARG_SECTION_NUMBER = "section_number";
-
-		/**
-		 * Returns a new instance of this fragment for the given section number.
-		 */
-		public static PlaceholderFragment newInstance(int sectionNumber) {
-			PlaceholderFragment fragment = new PlaceholderFragment();
-			Bundle args = new Bundle();
-			args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-			fragment.setArguments(args);
-			return fragment;
-		}
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_leaderboard,
-					container, false);
-			TextView textView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			textView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
-			return rootView;
-		}
-	}
-
 }
