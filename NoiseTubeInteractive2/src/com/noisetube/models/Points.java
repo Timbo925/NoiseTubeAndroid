@@ -2,6 +2,8 @@ package com.noisetube.models;
 
 import java.io.Serializable;
 
+import com.google.gson.Gson;
+
 public class Points implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -9,14 +11,12 @@ public class Points implements Serializable {
 	private double multiplierLocation;
 	private double multiplierTime;
 	private double multiplierSpecial;
-	private int oldLvl;
-	private int newLvl;
-	private int OldExp;
-	private int OldMax;
-	private int NewExp;
-	private int NewMax;
 	public static final String POINTS = "POINTS";
 	
+	public String toJsonString() {
+		Gson gson = new Gson();
+		return gson.toJson(this).toString();
+	}
 	
 	public long getPointsTotal() {
 		return Math.round( points*multiplierLocation*multiplierSpecial*multiplierTime);
@@ -72,87 +72,5 @@ public class Points implements Serializable {
 	/**
 	 * @return the oldLvl
 	 */
-	public int getOldLvl() {
-		return oldLvl;
-	}
-	/**
-	 * @param oldLvl the oldLvl to set
-	 */
-	public void setOldLvl(int oldLvl) {
-		this.oldLvl = oldLvl;
-	}
-	/**
-	 * @return the newLvl
-	 */
-	public int getNewLvl() {
-		return newLvl;
-	}
-	/**
-	 * @param newLvl the newLvl to set
-	 */
-	public void setNewLvl(int newLvl) {
-		this.newLvl = newLvl;
-	}
-	/**
-	 * @return the oldExp
-	 */
-	public int getOldExp() {
-		return OldExp;
-	}
-	/**
-	 * @param oldExp the oldExp to set
-	 */
-	public void setOldExp(int oldExp) {
-		OldExp = oldExp;
-	}
-	/**
-	 * @return the oldMax
-	 */
-	public int getOldMax() {
-		return OldMax;
-	}
-	/**
-	 * @param oldMax the oldMax to set
-	 */
-	public void setOldMax(int oldMax) {
-		OldMax = oldMax;
-	}
-	/**
-	 * @return the newExp
-	 */
-	public int getNewExp() {
-		return NewExp;
-	}
-	/**
-	 * @param newExp the newExp to set
-	 */
-	public void setNewExp(int newExp) {
-		NewExp = newExp;
-	}
-	/**
-	 * @return the newMax
-	 */
-	public int getNewMax() {
-		return NewMax;
-	}
-	/**
-	 * @param newMax the newMax to set
-	 */
-	public void setNewMax(int newMax) {
-		NewMax = newMax;
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "Points [points=" + points + ", multiplierLocation="
-				+ multiplierLocation + ", multiplierTime=" + multiplierTime
-				+ ", multiplierSpecial=" + multiplierSpecial + ", oldLvl="
-				+ oldLvl + ", newLvl=" + newLvl + ", OldExp=" + OldExp
-				+ ", OldMax=" + OldMax + ", NewExp=" + NewExp + ", NewMax="
-				+ NewMax + "]";
-	}
-	
 	
 }

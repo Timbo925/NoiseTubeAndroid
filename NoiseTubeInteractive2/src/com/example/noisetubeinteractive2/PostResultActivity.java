@@ -1,6 +1,7 @@
 package com.example.noisetubeinteractive2;
 
 import com.noisetube.models.Points;
+import com.noisetube.models.PostResponse;
 
 import android.app.Activity;
 import android.app.ActionBar;
@@ -75,6 +76,7 @@ public class PostResultActivity extends Activity {
 	public static class PointsFragment extends Fragment {
 		
 		private Points points;
+		private PostResponse postResponse;
 		private TextView textPoints;
 		private TextView textMultiLoc;
 		private TextView textMultiTime;
@@ -90,7 +92,9 @@ public class PostResultActivity extends Activity {
 			View rootView = inflater.inflate(R.layout.fragment_post_result,container, false);
 			
 			points = (Points) getActivity().getIntent().getExtras().getSerializable(Points.POINTS);
-			System.out.println(points);
+			postResponse = (PostResponse) getActivity().getIntent().getExtras().getSerializable(PostResponse.PARAM_POSTRESPONSE);
+			//System.out.println(points);
+			System.out.println("PostResponse" + postResponse);
 			
 			textPoints = (TextView) rootView.findViewById(R.id.post_points);
 			textMultiBonus = (TextView) rootView.findViewById(R.id.post_multi_bonus);

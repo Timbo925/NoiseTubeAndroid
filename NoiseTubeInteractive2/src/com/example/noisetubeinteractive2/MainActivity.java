@@ -42,6 +42,7 @@ import com.noisetube.main.ServerConnection;
 import com.noisetube.main.SoundMeasurement;
 import com.noisetube.main.SoundMeasurementService;
 import com.noisetube.models.Points;
+import com.noisetube.models.PostResponse;
 
 public class MainActivity extends Activity {
 
@@ -160,7 +161,7 @@ public class MainActivity extends Activity {
 
 	/**
 	 * @author Tim
-	 * BroadcastReceiver for for last broadcast by the Service. Will start starScore()
+	 * BroadcastReceiver for for last broadcast by the Service. Will execute the asyncService to post the neasurements
 	 */
 	public class FinalDbResponse extends BroadcastReceiver {
 
@@ -221,8 +222,13 @@ public class MainActivity extends Activity {
 		startActivity(intent);
 	}
 
+	/**
+	 * Post measurements to database and pass PostResponse to the next Activity to display progress
+	 * @author Tim
+	 *
+	 */
 	public class PostSoundMeasurement extends AsyncTask<SoundMeasurement, Void, JsonResponse> {
-		// <Prams excecution, Progress background published, Result >
+
 		@Override
 		protected JsonResponse doInBackground(SoundMeasurement... arg) {
 			String url = "http://nuNogNiet";		
@@ -243,15 +249,14 @@ public class MainActivity extends Activity {
 				points.setMultiplierSpecial(1);
 				points.setMultiplierTime(1);
 				points.setPoints(222);
-				points.setOldExp(200);
-				points.setNewExp(644);
-				points.setOldLvl(2);
-				points.setNewLvl(2);
-				points.setOldMax(800);
-				points.setNewMax(800);
+
+				PostResponse postResponse = new PostResponse();
+				postResponse.setPoints(points);
 				
 				Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
 				intent.putExtra(Points.POINTS, points);
+				intent.putExtra(PostResponse.PARAM_POSTRESPONSE, postResponse);
+				
 				startActivity(intent);
 			} else {
 				System.out.println("Success Put Point");
