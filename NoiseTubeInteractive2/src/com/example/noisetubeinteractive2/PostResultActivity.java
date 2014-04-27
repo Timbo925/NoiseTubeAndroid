@@ -1,20 +1,23 @@
 package com.example.noisetubeinteractive2;
 
-import com.noisetube.models.Points;
-import com.noisetube.models.PostResponse;
+import java.io.Console;
 
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.os.Build;
+
+import com.noisetube.models.Points;
+import com.noisetube.models.PostResponse;
+import com.noisetube.models.Stats;
 
 public class PostResultActivity extends Activity {
 	
@@ -75,7 +78,6 @@ public class PostResultActivity extends Activity {
 	
 	public static class PointsFragment extends Fragment {
 		
-		private Points points;
 		private PostResponse postResponse;
 		private TextView textPoints;
 		private TextView textMultiLoc;
@@ -87,14 +89,19 @@ public class PostResultActivity extends Activity {
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
+		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_post_result,container, false);
 			
-			points = (Points) getActivity().getIntent().getExtras().getSerializable(Points.POINTS);
 			postResponse = (PostResponse) getActivity().getIntent().getExtras().getSerializable(PostResponse.PARAM_POSTRESPONSE);
-			//System.out.println(points);
-			System.out.println("PostResponse" + postResponse);
+
+			SharedPreferences storage = getActivity().getSharedPreferences("prefs", 0); 					//Accessing local keyvalue store
+			SharedPreferences.Editor storageEditor = storage.edit();					//Make editing possible
+			Log.d("PostResultActivity", "StatsJson: " + postResponse.getStats().toJsonString());
+			
+			storageEditor.putString(Stats.STATS, postResponse.getStats().toJsonString());	//Save Stats in Json format
+			storageEditor.apply();													     	//Commit all changes 
+
+			Log.d("PostResultActivity", "PostResponse" + postResponse);
 			
 			textPoints = (TextView) rootView.findViewById(R.id.post_points);
 			textMultiBonus = (TextView) rootView.findViewById(R.id.post_multi_bonus);
@@ -102,12 +109,13 @@ public class PostResultActivity extends Activity {
 			textMultiTime = (TextView) rootView.findViewById(R.id.post_multi_time);
 			textPointsTotal = (TextView) rootView.findViewById(R.id.post_points_total);
 			
-			textPoints.setText(Integer.toString(points.getPoints()));
-			textMultiBonus.setText(Double.toString(points.getMultiplierSpecial()));
-			textMultiLoc.setText(Double.toString(points.getMultiplierLocation()));
-			textMultiTime.setText(Double.toString(points.getMultiplierTime()));
-			textPointsTotal.setText(Float.toString(points.getPointsTotal()));
+			textPoints.setText(Integer.toString(postResponse.getPoints().getPoints()));
+			textMultiBonus.setText(Double.toString(postResponse.getPoints().getMultiplierSpecial()));
+			textMultiLoc.setText(Double.toString(postResponse.getPoints().getMultiplierLocation()));
+			textMultiTime.setText(Double.toString(postResponse.getPoints().getMultiplierTime()));
+			textPointsTotal.setText(Float.toString(postResponse.getPoints().getPointsTotal()));
 			
+			//TODO save and show possible new badges
 			return rootView;
 		}	
 	}

@@ -15,7 +15,7 @@ public class Stats implements Serializable{
 	private int time;
 	
 	private static final long serialVersionUID = 1705459163208937073L;
-	private static final String STATS = "STATS";
+	public static final String STATS = "STATS";
 	
 	public String toJsonString() {
 		Gson gson = new Gson();

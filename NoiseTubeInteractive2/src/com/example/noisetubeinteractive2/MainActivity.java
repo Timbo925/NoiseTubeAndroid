@@ -1,19 +1,5 @@
 package com.example.noisetubeinteractive2;
 
-import java.io.IOException;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
-import org.apache.http.util.EntityUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -35,7 +21,6 @@ import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.noisetubeinteractive2.R;
 import com.google.gson.Gson;
 import com.noisetube.main.JsonResponse;
 import com.noisetube.main.ServerConnection;
@@ -43,6 +28,7 @@ import com.noisetube.main.SoundMeasurement;
 import com.noisetube.main.SoundMeasurementService;
 import com.noisetube.models.Points;
 import com.noisetube.models.PostResponse;
+import com.noisetube.models.Stats;
 
 public class MainActivity extends Activity {
 
@@ -170,10 +156,10 @@ public class MainActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			SoundMeasurement soundMeasurement = (SoundMeasurement) intent.getExtras().getSerializable(SoundMeasurementService.PARAM_OUT_SOUNDM);
-			
+
 			Gson gson = new Gson();
 			System.out.println(gson.toJson(soundMeasurement).toString());
-			
+
 			PostSoundMeasurement postSoundMeasurement = new PostSoundMeasurement();
 			postSoundMeasurement.execute(soundMeasurement);
 		}
@@ -243,6 +229,7 @@ public class MainActivity extends Activity {
 		protected void onPostExecute(JsonResponse jsonResponse) { //Access to the GUI tread
 			if (jsonResponse.hasErrors()) {
 				System.out.println("Errors Put Points");
+
 				//TODO Use real points response
 				Points points = new Points();
 				points.setMultiplierLocation(2);
@@ -250,17 +237,24 @@ public class MainActivity extends Activity {
 				points.setMultiplierTime(1);
 				points.setPoints(222);
 
+				Stats stats = new Stats();
+				stats.setAmount(11);
+				stats.setExp(501);
+				stats.setExpMax(1010);
+				stats.setLevel(4);
+				stats.setTime(600);
+
 				PostResponse postResponse = new PostResponse();
 				postResponse.setPoints(points);
-				
+				postResponse.setStats(stats);
+
 				Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
-				intent.putExtra(Points.POINTS, points);
 				intent.putExtra(PostResponse.PARAM_POSTRESPONSE, postResponse);
-				
+
 				startActivity(intent);
 			} else {
 				System.out.println("Success Put Point");
-			
+
 			}
 		}			
 	}
