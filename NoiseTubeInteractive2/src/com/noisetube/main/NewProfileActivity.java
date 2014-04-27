@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.example.noisetubeinteractive2.BadgesActivity;
+import com.example.noisetubeinteractive2.LeaderboardActivity;
 import com.example.noisetubeinteractive2.R;
 import com.google.gson.JsonObject;
 
@@ -112,6 +113,11 @@ public class NewProfileActivity extends Activity {
 	
 	public void startBadges(View v) {
 		Intent intent = new Intent(this, BadgesActivity.class);
+		startActivity(intent);
+	}
+	
+	public void startLeaderboard(View v) {
+		Intent intent = new Intent(this, LeaderboardActivity.class);
 		startActivity(intent);
 	}
 

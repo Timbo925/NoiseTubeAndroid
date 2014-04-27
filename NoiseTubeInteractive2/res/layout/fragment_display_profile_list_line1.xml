@@ -115,14 +115,51 @@
         </LinearLayout>
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:weightSum="2"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/profile_badge"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="24dp"
+            android:background="@drawable/btn_inside_card"
+            android:gravity="center"
+            android:onClick="startBadges"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="BADGES"
+            android:textColor="#636769"
+            android:textSize="15dp" />
+        
+           <Button
+            android:id="@+id/profile_leaderboard"
+            android:layout_width="0sp"
+            android:layout_weight="1"
+            android:layout_height="24dp"
+            android:background="@drawable/btn_inside_card"
+            android:gravity="center"
+            android:onClick="startLeaderboard"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:text="LEADERBOARD"
+            android:textColor="#636769"
+            android:textSize="15dp" />
+    </LinearLayout>
+    <!--
     <Button
         android:id="@+id/post_leaderboard"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/btn_blue_small"
+        android:background="@drawable/btn_inside_card"
         android:gravity="center"
         android:onClick="startBadges"
         android:text="Badges"
         android:textColor="#FFFFFF" />
+    -->
 
 </LinearLayout>
