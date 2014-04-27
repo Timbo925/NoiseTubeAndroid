@@ -1,4 +1,4 @@
-package com.noisetube.main;
+package com.example.noisetubeinteractive2;
 
 import java.io.IOException;
 
@@ -35,9 +35,12 @@ import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.example.noisetubeinteractive2.PostResult;
 import com.example.noisetubeinteractive2.R;
 import com.google.gson.Gson;
+import com.noisetube.main.JsonResponse;
+import com.noisetube.main.ServerConnection;
+import com.noisetube.main.SoundMeasurement;
+import com.noisetube.main.SoundMeasurementService;
 import com.noisetube.models.Points;
 
 public class MainActivity extends Activity {
@@ -214,7 +217,7 @@ public class MainActivity extends Activity {
 
 
 	public void startProfile() {
-		Intent intent = new Intent(this, NewProfileActivity.class);
+		Intent intent = new Intent(this, ProfileActivity.class);
 		startActivity(intent);
 	}
 
@@ -247,7 +250,7 @@ public class MainActivity extends Activity {
 				points.setOldMax(800);
 				points.setNewMax(800);
 				
-				Intent intent = new Intent(getApplicationContext(), PostResult.class);
+				Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
 				intent.putExtra(Points.POINTS, points);
 				startActivity(intent);
 			} else {

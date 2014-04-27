@@ -1,4 +1,4 @@
-package com.noisetube.main;
+package com.example.noisetubeinteractive2;
 
 import java.io.IOException;
 
@@ -11,10 +11,10 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.example.noisetubeinteractive2.BadgesActivity;
-import com.example.noisetubeinteractive2.LeaderboardActivity;
 import com.example.noisetubeinteractive2.R;
 import com.google.gson.JsonObject;
+import com.noisetube.main.JsonResponse;
+import com.noisetube.main.ServerConnection;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -28,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class NewProfileActivity extends Activity {
+public class ProfileActivity extends Activity {
 
 	private static String statsURL = "http://192.168.1.8:3002/user/5db7088d63a6737ee272f5f1dff8ac37ede5cbef27ea8380f8d691ce59de2d1a";
 	TextView textProfileUserName;

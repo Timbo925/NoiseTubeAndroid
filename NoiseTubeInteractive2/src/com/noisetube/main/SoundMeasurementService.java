@@ -5,9 +5,9 @@ import android.content.BroadcastReceiver;
 import android.content.Intent;
 import android.util.Log;
 
+import com.example.noisetubeinteractive2.MainActivity.DbResponse;
+import com.example.noisetubeinteractive2.MainActivity.FinalDbResponse;
 import com.google.gson.Gson;
-import com.noisetube.main.MainActivity.DbResponse;
-import com.noisetube.main.MainActivity.FinalDbResponse;
 
 public class SoundMeasurementService extends IntentService {
 

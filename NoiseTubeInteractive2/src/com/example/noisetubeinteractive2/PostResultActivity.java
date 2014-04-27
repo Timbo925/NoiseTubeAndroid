@@ -1,6 +1,5 @@
 package com.example.noisetubeinteractive2;
 
-import com.noisetube.main.NewProfileActivity;
 import com.noisetube.models.Points;
 
 import android.app.Activity;
@@ -16,7 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.os.Build;
 
-public class PostResult extends Activity {
+public class PostResultActivity extends Activity {
 	
 	Points points;
 
