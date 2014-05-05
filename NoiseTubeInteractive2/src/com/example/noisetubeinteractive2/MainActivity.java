@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.noisetube.main.JsonResponse;
+import com.noisetube.main.PointMeasurement;
 import com.noisetube.main.ServerConnection;
 import com.noisetube.main.SoundMeasurement;
 import com.noisetube.main.SoundMeasurementService;
@@ -131,12 +132,23 @@ public class MainActivity extends Activity {
 				TextView textDbMin = (TextView) frag.getView().findViewById(R.id.home_min_db);
 				TextView textDbAvg = (TextView) frag.getView().findViewById(R.id.home_avg_db);
 				ProgressBar progressBar = (ProgressBar) frag.getView().findViewById(R.id.progress_bar_meter);
-
-				textDbMax.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MAX, 0)) + dbText);
-				textDbMin.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MIN, 0)) + dbText);
-				textDbAvg.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_AVG, 0)) + dbText);
-				textDbLvl.setText(Integer.toString(intent.getIntExtra(SoundMeasurementService.PARAM_OUT_MSG, 0))  + dbText);
-				progressBar.setProgress(100 - intent.getIntExtra(SoundMeasurementService.PARAM_OUT_PER, 0));
+				TextView textPoints = (TextView) frag.getView().findViewById(R.id.home_points);
+				TextView textPointsTotal = (TextView) frag.getView().findViewById(R.id.home_points_total);
+				TextView textMulti  = (TextView) frag.getView().findViewById(R.id.home_multi_loc);
+				TextView textMultiBonus = (TextView) frag.getView().findViewById(R.id.home_multi_bonus);
+				
+				SoundMeasurement soundMeasurement = (SoundMeasurement) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_SOUNDM);
+				PointMeasurement pointMeasurement = (PointMeasurement) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_POINTM);
+				System.out.println(pointMeasurement);
+				textDbMax.setText(Integer.toString(soundMeasurement.getDbMax()) + dbText);
+				textDbMin.setText(Integer.toString(soundMeasurement.getDbMin()) + dbText);
+				textDbAvg.setText(Integer.toString(soundMeasurement.getDbAvg()) + dbText);
+				textDbLvl.setText(Integer.toString(soundMeasurement.getDbLast())  + dbText);
+				progressBar.setProgress((int) Math.round(100 - soundMeasurement.getDbPercent()));
+				textPoints.setText(Integer.toString(pointMeasurement.getPoints()));
+				textMultiBonus.setText(Integer.toString(pointMeasurement.getBonusPoints()));
+				textMulti.setText(Double.toString(pointMeasurement.getLocationMultiplier()));
+				textPointsTotal.setText(Integer.toString(pointMeasurement.getTotalPoints()));
 
 			} catch (Exception e) {
 				e.printStackTrace();

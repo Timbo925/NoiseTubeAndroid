@@ -7,7 +7,7 @@ import java.util.Map;
 
 
 
-public class Poi {
+public class Poi implements Comparable<Poi>{
 
 	private int idPoi;
 	private String name;
@@ -20,6 +20,16 @@ public class Poi {
 	private Double distance;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+	
+	public int compareTo (Poi poi) {
+		if (poi.radius < radius) {
+			return -1;
+		} else if (poi.radius == radius) {
+			return 0;
+		} else {
+			return 1;
+		}
+	}
 	public int getIdPoi() {
 		return idPoi;
 	}

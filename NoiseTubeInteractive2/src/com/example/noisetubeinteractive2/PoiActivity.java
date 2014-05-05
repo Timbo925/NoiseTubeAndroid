@@ -25,6 +25,7 @@ import com.noisetube.main.JsonResponse;
 import com.noisetube.main.ServerConnection;
 import com.noisetube.models.LeaderboardEntry;
 import com.noisetube.models.Poi;
+import com.vub.storage.PoiStorage;
 
 public class PoiActivity extends Activity {
 
@@ -64,6 +65,7 @@ public class PoiActivity extends Activity {
 	 */
 	public static class PoiFragment extends Fragment {
 
+		private PoiStorage poiStorage; 
 		private PoiAdapter adapter;
 		private ListView listView;
 		
@@ -75,15 +77,22 @@ public class PoiActivity extends Activity {
 			View rootView = inflater.inflate(R.layout.fragment_poi, container,false);
 			
 			Log.d("PoiFragment", "Creating View");
-			
+			poiStorage = new PoiStorage(getActivity());
 			listView = (ListView) rootView.findViewById(R.id.poi_listView);
 			
 			adapter = new PoiAdapter(new ArrayList<Poi>(), getActivity());
 			
+			if( poiStorage.getPoiList() == null ) {
+				GetPoi loadPois = new GetPoi();
+				loadPois.execute("poi/50.8637829/4.418763/10" , "");
+			} else {
+				Log.d("PoiActivity", "Using Local Poi");
+				adapter.setPois(poiStorage.getPoiList());
+				GetPoi loadPois = new GetPoi();
+				loadPois.execute("poi/50.8637829/4.418763/10" , "");
+			}
+
 			listView.setAdapter(adapter);
-			
-			GetPoi loadPois = new GetPoi();
-			loadPois.execute("poi/50.8637829/4.418763/10" , "");
 			return rootView;
 		}
 		
@@ -115,12 +124,16 @@ public class PoiActivity extends Activity {
 				} else {
 					ObjectMapper mapper = new ObjectMapper();
 					try {
-						Log.d("GetPoi", jsonResponse.getMessage());
+						//Log.d("GetPoi", jsonResponse.getMessage());
 						List<Poi> pois = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<Poi>>(){});
-						System.out.println("POI Entrys from server: " + pois);
+						//System.out.println("POI Entrys from server: " + pois);
 						
-						adapter.setPois(pois);
+						//If offline only local storage will be used
+						poiStorage.setPoiList(pois);
+						
 						Log.d("GetPoi", "Notifying adapterof data set changed");
+						adapter.setPois(pois);
+						
 						
 					} catch (IOException e) {
 						e.printStackTrace();

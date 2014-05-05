@@ -57,7 +57,7 @@ public class SoundMeasurement implements Serializable {
 			//Calculation of percentage based on range DbMeter 
 			double spread = DbMeter.MAXIMUM_DB-DbMeter.MINIMUM_DB;
 			double spreadMulti = 100.0/spread;
-			dbPercent = (int) (spreadMulti * (db - DbMeter.MINIMUM_DB));
+			dbPercent = (spreadMulti * (db - DbMeter.MINIMUM_DB));
 			
 			//Update Average/Min/Max
 			dbAvg = ((dbAvg * (counter - 1)) + db) / counter ;

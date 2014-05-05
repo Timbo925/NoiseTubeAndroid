@@ -1,5 +1,6 @@
 package com.noisetube.adapters;
 
+import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
@@ -31,6 +32,7 @@ public class PoiAdapter extends ArrayAdapter<Poi> {
 
 	public void setPois(List<Poi> poisIn) {
 		//Log.d("MyListAdapter", "Set dataset: " + pois);
+		Collections.sort(poisIn);
 		pois.clear();
 		pois.addAll(poisIn);
 		this.notifyDataSetChanged();

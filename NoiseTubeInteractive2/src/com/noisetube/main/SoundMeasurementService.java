@@ -3,6 +3,7 @@ package com.noisetube.main;
 import android.app.IntentService;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.example.noisetubeinteractive2.MainActivity.DbResponse;
@@ -21,8 +22,12 @@ public class SoundMeasurementService extends IntentService {
 	public static final String PARAM_OUT_SOUNDM = "outMsg SoundMeasurement in Json SoundMeasurementService";
 	public static final String PARAM_COMMAND = "command";
 	public static final String PARAM_STOP_COMMAND = "stop";
+	public static final String PARAM_OUT_POINTM = "outMsg PointMeasurement";
+	
 	private boolean isStoped = false;
-	private SoundMeasurement soundMeasurement;
+	private static final long measurmentsSecond = 1000;
+	private SoundMeasurement soundMeasurement = new SoundMeasurement();
+	private PointMeasurement pointMeasurement = new PointMeasurement();
 	
 
 	public SoundMeasurementService() {
@@ -53,26 +58,30 @@ public class SoundMeasurementService extends IntentService {
 			return; 
 		}
 		soundMeasurement = new SoundMeasurement();
+		pointMeasurement = new PointMeasurement();
+		
+		long oldTime = SystemClock.elapsedRealtime();
 		while (!isStoped) {
+			while ((SystemClock.elapsedRealtime() - oldTime) < measurmentsSecond) {
+				
+			}
 			soundMeasurement.measure();	
+			pointMeasurement.measure();
 			//Creating broadcast
 			Intent broadcastIntent = new Intent();
 			broadcastIntent.setAction(DbResponse.ACTION_RESP);
 			broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
-			broadcastIntent.putExtra(PARAM_OUT_MSG, soundMeasurement.getDbLast());
-			broadcastIntent.putExtra(PARAM_OUT_PER, (int) soundMeasurement.getDbPercent());
-			broadcastIntent.putExtra(PARAM_OUT_AVG, (int) soundMeasurement.getDbAvg());
-			broadcastIntent.putExtra(PARAM_OUT_MAX, soundMeasurement.getDbMax());
-			broadcastIntent.putExtra(PARAM_OUT_MIN, soundMeasurement.getDbMin());
-			broadcastIntent.putExtra(PARAM_OUT_TIME, soundMeasurement.getTime());
 			broadcastIntent.putExtra(PARAM_OUT_SOUNDM, soundMeasurement);
+			broadcastIntent.putExtra(PARAM_OUT_POINTM, pointMeasurement);
 			sendBroadcast(broadcastIntent);
+			oldTime = SystemClock.elapsedRealtime();
 		}
 		
 		Intent broadcastIntent = new Intent();
 		broadcastIntent.setAction(FinalDbResponse.ACTION_RESP);
 		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 		broadcastIntent.putExtra(PARAM_OUT_SOUNDM, soundMeasurement);
+		broadcastIntent.putExtra(PARAM_OUT_POINTM, pointMeasurement);
 		sendBroadcast(broadcastIntent);
 		//TODO steps when stop measuring
 		this.stopSelf();
