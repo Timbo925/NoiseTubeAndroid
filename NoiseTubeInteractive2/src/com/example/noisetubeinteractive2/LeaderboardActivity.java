@@ -1,8 +1,11 @@
 package com.example.noisetubeinteractive2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+
+import org.apache.http.client.ClientProtocolException;
 
 import android.app.ActionBar;
 import android.app.Activity;
@@ -10,9 +13,11 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,8 +27,14 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.noisetube.main.JsonResponse;
+import com.noisetube.main.ServerConnection;
+import com.noisetube.models.LeaderboardEntry;
 import com.noisetube.models.LeaderboardType;
-import com.noisetube.models.UserLeaderboard;
 
 public class LeaderboardActivity extends Activity implements
 ActionBar.TabListener {
@@ -148,11 +159,11 @@ ActionBar.TabListener {
 
 			switch (position) {
 			case 0:
-				return ScoreLeaderboardFragment.newInstance(LeaderboardType.SCORE);
+				return ScoreLeaderboardFragment.newInstance(LeaderboardType.maxExp);
 			case 1:
-				return ScoreLeaderboardFragment.newInstance(LeaderboardType.LEVEL);
+				return ScoreLeaderboardFragment.newInstance(LeaderboardType.level);
 			case 2:
-				return ScoreLeaderboardFragment.newInstance(LeaderboardType.AMOUNT);
+				return ScoreLeaderboardFragment.newInstance(LeaderboardType.amountMeasurments);
 			}
 			return new ScoreLeaderboardFragment();
 		}
@@ -180,9 +191,9 @@ ActionBar.TabListener {
 
 	public static class ScoreLeaderboardFragment extends Fragment {
 
-		private List<UserLeaderboard> users = new ArrayList<UserLeaderboard>();
-		private boolean populated = false;
-
+		private MyListAdapter adapter;
+		private ListView listView;
+		
 		public static final String TYPE = "leaderboard_type";
 
 		/**
@@ -190,7 +201,6 @@ ActionBar.TabListener {
 		 */
 		public ScoreLeaderboardFragment() {	
 		}
-
 
 		/**
 		 * @param type - Type will beside the kind of leaderboard loaded from server
@@ -204,64 +214,129 @@ ActionBar.TabListener {
 			return fragment;
 		}
 
-
-
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_leaderboard_score,container, false);
 
-			populateListView(rootView);
+			LeaderboardType type = (LeaderboardType) getArguments().getSerializable(TYPE);
+			System.out.println("Get Type: " + type);
 
+			//Configure the list view
+			listView = (ListView)  rootView.findViewById(R.id.leaderboard_listview_score);
+			
+			// Building custom adapter to be used
+			adapter = new MyListAdapter(new ArrayList<LeaderboardEntry>(), getActivity(), type);
+			Log.d("onCreateView", "Adapter build and set");
+			
+			listView.setAdapter(adapter);
+
+			//TODO get session Id
+			GetLeaderboard loadLeaderboard = new GetLeaderboard();
+			loadLeaderboard.execute("leaderboard/test/", type.toString());
+			
 			return rootView;
 		}
 
-		private void populateListView(View rootView) {
-			// Create list of items
-			// TODO retreive correct users from the API
-			if (!populated) {
-				populated = true;
-				LeaderboardType type = (LeaderboardType) getArguments().getSerializable(TYPE);
-				System.out.println("Get Type: " + type);
-				for (int i = 0;i < 8; i++) {
-					users.add(new UserLeaderboard("Timbo", 22*(9-i)));
-					users.add(new UserLeaderboard("Jobo", 23*(9-i)));
-					users.add(new UserLeaderboard("Monique", 24*(9-i)));		
-				}
-
-			}
-
-			// Build Adapter with custom view reslolver
-			ArrayAdapter<UserLeaderboard> adapter = new MyListAdapter();
-
-			//Configure the list view
-			ListView listView = (ListView)  rootView.findViewById(R.id.leaderboard_listview_score);
-			listView.setAdapter(adapter);
-		}
-
-		private class MyListAdapter extends ArrayAdapter<UserLeaderboard> {
-			public MyListAdapter() {
-				super(getActivity(), R.layout.fragment_leaderboard_score_item, users);
-			}
+		//Params: url + type
+		public class GetLeaderboard extends AsyncTask<String, Void, JsonResponse> {
 
 			@Override
-			public View getView(int position, View convertView, ViewGroup parent) {
+			protected JsonResponse doInBackground(String... params) {
+				Log.d("GetLeaderBoard", "Starting backgound");
+				ServerConnection serverConnection = (ServerConnection) getActivity().getApplication();
+				JsonResponse jsonResponse = new JsonResponse();
+				try {
 
+					String url = params[0] + params[1];
+					jsonResponse = serverConnection.get(url);
+
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return jsonResponse;
+
+			}
+			@Override
+			protected void onPostExecute(JsonResponse jsonResponse) {
+				super.onPostExecute(jsonResponse);
+				if(jsonResponse.hasErrors()) {
+					System.out.println("Get leaderboard has erros: " + jsonResponse.getMessage());
+				} else {
+					ObjectMapper mapper = new ObjectMapper();
+					try {
+						List<LeaderboardEntry> leaderboardEntries = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<LeaderboardEntry>>(){});
+						System.out.println("Leaderboard Entrys from server: " + leaderboardEntries);
+//						Log.d("GetLeaderboard", "Creating new listview");
+//						listView = (ListView)  getActivity().findViewById(R.id.leaderboard_listview_score);
+//						adapter = new MyListAdapter(new ArrayList<LeaderboardEntry>(), getActivity());
+						
+						adapter.setLeaderboardEntries(leaderboardEntries);
+						Log.d("GetLeaderboard", "Notifying adapterof data set changed");
+						//adapter.notifyDataSetChanged();
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+				}
+			}
+
+		}
+
+		private class MyListAdapter extends ArrayAdapter<LeaderboardEntry> {
+
+			private List<LeaderboardEntry>  leaderboardEntries;
+			private Context context;
+			private LeaderboardType type;
+			
+			public MyListAdapter(List<LeaderboardEntry> leaderboardEntries, Context ctx, LeaderboardType type) {
+				super(getActivity(), R.layout.fragment_leaderboard_score_item, leaderboardEntries);
+				this.leaderboardEntries = leaderboardEntries;
+				this.context = ctx;
+				this.type = type;
+			}
+			
+			public List<LeaderboardEntry> getLeaderboardEntries() {
+				return leaderboardEntries;
+			}
+
+			public void setLeaderboardEntries(List<LeaderboardEntry> leaderboardEntriesIn) {
+				//Log.d("MyListAdapter", "Set dataset: " + leaderboardEntries);
+				leaderboardEntries.clear();
+				leaderboardEntries.addAll(leaderboardEntriesIn);
+				this.notifyDataSetChanged();
+			}
+			
+			@Override
+			public View getView(int position, View convertView, ViewGroup parent) {
+				
 				// Make sure we have a view to inflate because for the fist element we dont have this view
 				View itemView = convertView;
 				if (itemView == null) {
-					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
+					LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE );
 					itemView = inflater.inflate(R.layout.fragment_leaderboard_score_item, parent, false);
 				}
 
 				//Selecting correct user from the arraylist
-				UserLeaderboard userLeaderboard = users.get(position); 
+				LeaderboardEntry leaderboardEntry = leaderboardEntries.get(position);
 
 				//Filling the view
+				Log.d("Adapter" , "Expanding");
 				TextView textUserName = (TextView) itemView.findViewById(R.id.leaderboard_username);
 				TextView textScore = (TextView) itemView.findViewById(R.id.leaderboard_points);
 
-				textUserName.setText(userLeaderboard.getUserName());
-				textScore.setText(Integer.toString(userLeaderboard.getPoints()));
+				textUserName.setText(leaderboardEntry.getUserName());
+				
+				if (LeaderboardType.maxExp == type) {
+					textScore.setText(Integer.toString(leaderboardEntry.getMaxExp()));
+				} else if (LeaderboardType.amountMeasurments == type) {
+					textScore.setText(Integer.toString(leaderboardEntry.getAmountMeasurments()));
+				} else {
+					textScore.setText(Integer.toString(leaderboardEntry.getLevel()));
+				}
+				
 				return itemView;
 			}
 

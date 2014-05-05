@@ -6,6 +6,6 @@ package com.noisetube.models;
  * 
  */
 public enum LeaderboardType {
-	SCORE, LEVEL, AMOUNT
+	maxExp, level, amountMeasurments
 
 }

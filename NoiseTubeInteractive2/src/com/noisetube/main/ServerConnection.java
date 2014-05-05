@@ -16,6 +16,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import android.app.Application;
+import android.util.Log;
 
 import com.google.gson.Gson;
 
@@ -25,6 +26,7 @@ import com.google.gson.Gson;
  * Access trough: ServerConnection serverConnection = (ServerConnection) getApplication();
  */
 public class ServerConnection extends Application {
+	public static final String base_url = "http://192.168.0.103:3002/";
 	HttpClient client = new DefaultHttpClient();
 	HttpResponse response;
 	Gson gson = new Gson();
@@ -37,6 +39,8 @@ public class ServerConnection extends Application {
 	 * @throws ClientProtocolException 
 	 */
 	public JsonResponse get(String url, String body) {
+		url = base_url + url;
+		Log.d("Server", url);
 		HttpGet get = new HttpGet(url);
 		JSONObject jsonObject = new JSONObject();
 		JsonResponse jsonResponse = new JsonResponse();
@@ -78,6 +82,8 @@ public class ServerConnection extends Application {
 	 * @throws IOException
 	 */
 	public JsonResponse post(String url, String body) {
+		url = base_url + url;
+		Log.d("Server", url);
 		HttpPost post = new HttpPost(url);
 		JsonResponse jsonResponse = new JsonResponse();
 		try {
