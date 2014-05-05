@@ -43,5 +43,6 @@
     <string name="post_lvl">Level</string>
     <string name="title_activity_leaderboard">Leaderboard</string>
     <string name="title_activity_badges">BadgesActivity</string>
+    <string name="title_activity_poi">Point Of Intrests</string>
 
 </resources>

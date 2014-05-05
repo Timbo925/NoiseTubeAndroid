@@ -269,13 +269,10 @@ ActionBar.TabListener {
 					try {
 						List<LeaderboardEntry> leaderboardEntries = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<LeaderboardEntry>>(){});
 						System.out.println("Leaderboard Entrys from server: " + leaderboardEntries);
-//						Log.d("GetLeaderboard", "Creating new listview");
-//						listView = (ListView)  getActivity().findViewById(R.id.leaderboard_listview_score);
-//						adapter = new MyListAdapter(new ArrayList<LeaderboardEntry>(), getActivity());
 						
 						adapter.setLeaderboardEntries(leaderboardEntries);
 						Log.d("GetLeaderboard", "Notifying adapterof data set changed");
-						//adapter.notifyDataSetChanged();
+						//adapter.notifyDataSetChanged(); //Not working this function is called inside the setter
 						
 					} catch (IOException e) {
 						e.printStackTrace();
