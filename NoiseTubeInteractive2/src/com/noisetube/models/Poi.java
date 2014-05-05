@@ -5,17 +5,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+
 public class Poi {
 
 	private int idPoi;
 	private String name;
-	private List<List<Position>> position = new ArrayList<List<Position>>();
+	private List<Float> position = new ArrayList<Float>();
 	private String description;
 	private int bonusPoints;
 	private float bonusMulti;
 	private int radius;
 	private String type;
-	private Object distance;
+	private Double distance;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
 	public int getIdPoi() {
@@ -44,15 +46,15 @@ public class Poi {
 		return this;
 	}
 
-	public List<List<Position>> getPosition() {
+	public List<Float> getPosition() {
 		return position;
 	}
 
-	public void setPosition(List<List<Position>> position) {
+	public void setPosition(List<Float> position) {
 		this.position = position;
 	}
 
-	public Poi withPosition(List<List<Position>> position) {
+	public Poi withPosition(List<Float> position) {
 		this.position = position;
 		return this;
 	}
@@ -122,15 +124,15 @@ public class Poi {
 		return this;
 	}
 
-	public Object getDistance() {
+	public Double getDistance() {
 		return distance;
 	}
 
-	public void setDistance(Object distance) {
+	public void setDistance(Double distance) {
 		this.distance = distance;
 	}
 
-	public Poi withDistance(Object distance) {
+	public Poi withDistance(Double distance) {
 		this.distance = distance;
 		return this;
 	}

@@ -2,44 +2,61 @@ package com.noisetube.models;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({
+	"x",
+	"y"
+})
 public class Position {
 
-	private Double x;
-	private Double y;
+	@JsonProperty("x")
+	private float x;
+	@JsonProperty("y")
+	private float y;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-	public Double getX() {
+	@JsonProperty("x")
+	public float getX() {
 		return x;
 	}
 
-	public void setX(Double x) {
+	@JsonProperty("x")
+	public void setX(float x) {
 		this.x = x;
 	}
 
-	public Position withX(Double x) {
+	public Position withX(float x) {
 		this.x = x;
 		return this;
 	}
 
-	public Double getY() {
+	@JsonProperty("y")
+	public float getY() {
 		return y;
 	}
 
-	public void setY(Double y) {
+	@JsonProperty("y")
+	public void setY(float y) {
 		this.y = y;
 	}
 
-	public Position withY(Double y) {
+	public Position withY(float y) {
 		this.y = y;
 		return this;
 	}
 
-
+	@JsonAnyGetter
 	public Map<String, Object> getAdditionalProperties() {
 		return this.additionalProperties;
 	}
 
+	@JsonAnySetter
 	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
 	}

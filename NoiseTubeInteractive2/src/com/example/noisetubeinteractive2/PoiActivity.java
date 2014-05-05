@@ -1,15 +1,30 @@
 package com.example.noisetubeinteractive2;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.http.client.ClientProtocolException;
+
 import android.app.Activity;
-import android.app.ActionBar;
 import android.app.Fragment;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.os.Build;
+import android.widget.ListView;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.noisetube.adapters.PoiAdapter;
+import com.noisetube.main.JsonResponse;
+import com.noisetube.main.ServerConnection;
+import com.noisetube.models.LeaderboardEntry;
+import com.noisetube.models.Poi;
 
 public class PoiActivity extends Activity {
 
@@ -20,7 +35,7 @@ public class PoiActivity extends Activity {
 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
+					.add(R.id.container, new PoiFragment()).commit();
 		}
 	}
 
@@ -47,17 +62,73 @@ public class PoiActivity extends Activity {
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	public static class PlaceholderFragment extends Fragment {
+	public static class PoiFragment extends Fragment {
 
-		public PlaceholderFragment() {
+		private PoiAdapter adapter;
+		private ListView listView;
+		
+		public PoiFragment() {
 		}
 
 		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_poi, container,
-					false);
+		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+			View rootView = inflater.inflate(R.layout.fragment_poi, container,false);
+			
+			Log.d("PoiFragment", "Creating View");
+			
+			listView = (ListView) rootView.findViewById(R.id.poi_listView);
+			
+			adapter = new PoiAdapter(new ArrayList<Poi>(), getActivity());
+			
+			listView.setAdapter(adapter);
+			
+			GetPoi loadPois = new GetPoi();
+			loadPois.execute("poi/50.8637829/4.418763/10" , "");
 			return rootView;
+		}
+		
+		public class GetPoi extends AsyncTask<String, Void, JsonResponse> {
+
+			@Override
+			protected JsonResponse doInBackground(String... params) {
+				Log.d("GetPoi", "Starting backgound");
+				ServerConnection serverConnection = (ServerConnection) getActivity().getApplication();
+				JsonResponse jsonResponse = new JsonResponse();
+				try {
+
+					String url = params[0] + params[1];
+					jsonResponse = serverConnection.get(url);
+
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return jsonResponse;
+
+			}
+			@Override
+			protected void onPostExecute(JsonResponse jsonResponse) {
+				super.onPostExecute(jsonResponse);
+				if(jsonResponse.hasErrors()) {
+					System.out.println("GetPoi has erros: " + jsonResponse.getMessage());
+				} else {
+					ObjectMapper mapper = new ObjectMapper();
+					try {
+						Log.d("GetPoi", jsonResponse.getMessage());
+						List<Poi> pois = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<Poi>>(){});
+						System.out.println("POI Entrys from server: " + pois);
+						
+						adapter.setPois(pois);
+						Log.d("GetPoi", "Notifying adapterof data set changed");
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+				}
+			}
+
 		}
 	}
 

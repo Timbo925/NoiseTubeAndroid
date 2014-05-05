@@ -18,13 +18,11 @@ public class PoiAdapter extends ArrayAdapter<Poi> {
 
 	private List<Poi>  pois;
 	private Context context;
-	private LeaderboardType type;
 	
-	public PoiAdapter(List<Poi> pois, Context ctx, LeaderboardType type) {
+	public PoiAdapter(List<Poi> pois, Context ctx) {
 		super(ctx, R.layout.fragment_poi_list_item, pois);
 		this.pois = pois;
 		this.context = ctx;
-		this.type = type;
 	}
 	
 	public List<Poi> getPois() {
@@ -56,10 +54,12 @@ public class PoiAdapter extends ArrayAdapter<Poi> {
 		TextView textTitle = (TextView) itemView.findViewById(R.id.poi_item_title);
 		TextView textMulti = (TextView) itemView.findViewById(R.id.poi_item_multi);
 		TextView textBonus = (TextView) itemView.findViewById(R.id.poi_item_bonus);
+		TextView textDistance = (TextView) itemView.findViewById(R.id.poi_item_distance);
 		
 		textTitle.setText(poi.getName());
 		textMulti.setText(Float.toString(poi.getBonusMulti()));
 		textBonus.setText(Float.toString(poi.getBonusPoints()));
+		textDistance.setText((Double.toString(poi.getDistance())) + " km" );
 		
 		return itemView;
 	}

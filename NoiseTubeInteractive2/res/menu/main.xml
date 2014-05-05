@@ -7,7 +7,7 @@
         android:orderInCategory= "1"
         android:showAsAction="always"
         android:title="@string/action_measurement"
-        android:icon="@drawable/ic_action_new"/>
+        android:icon="@drawable/ic_action_place"/>
     
     <item 
         android:id="@+id/action_profile"

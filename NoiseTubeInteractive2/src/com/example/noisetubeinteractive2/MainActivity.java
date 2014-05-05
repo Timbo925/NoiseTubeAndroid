@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
 
 		switch (item.getItemId()) {
 		case R.id.action_measurement:
-
+			startPoi();
 			System.out.println("actoin_measurement clicked");
 			return true;
 		case R.id.action_profile:
@@ -205,6 +205,11 @@ public class MainActivity extends Activity {
 
 	public void startProfile() {
 		Intent intent = new Intent(this, ProfileActivity.class);
+		startActivity(intent);
+	}
+	
+	public void startPoi() {
+		Intent intent = new Intent(this, PoiActivity.class);
 		startActivity(intent);
 	}
 
