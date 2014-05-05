@@ -64,7 +64,7 @@
             android:layout_alignParentLeft="true"
             android:layout_below="@+id/textView3"
             android:paddingRight="6dp"
-            android:text="Bonus Points a second:" />
+            android:text="Bonus Points:" />
 
         <TextView
             android:id="@+id/poi_item_bonus"

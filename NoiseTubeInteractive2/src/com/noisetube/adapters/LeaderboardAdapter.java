@@ -55,8 +55,10 @@ public class LeaderboardAdapter extends ArrayAdapter<LeaderboardEntry> {
 		//Log.d("Adapter" , "Expanding");
 		TextView textUserName = (TextView) itemView.findViewById(R.id.leaderboard_username);
 		TextView textScore = (TextView) itemView.findViewById(R.id.leaderboard_points);
+		TextView textRank = (TextView) itemView.findViewById(R.id.leaderboard_rank);
 
 		textUserName.setText(leaderboardEntry.getUserName());
+		textRank.setText(Integer.toString(leaderboardEntry.getRank()));
 		
 		if (LeaderboardType.maxExp == type) {
 			textScore.setText(Integer.toString(leaderboardEntry.getMaxExp()));
