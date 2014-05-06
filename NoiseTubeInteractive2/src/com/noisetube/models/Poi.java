@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 
 
 public class Poi implements Comparable<Poi>{
@@ -20,7 +22,25 @@ public class Poi implements Comparable<Poi>{
 	private Double distance;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+	@JsonIgnore
+	public List<Position> getPoints() {
+		List<Position> points = new ArrayList<Position>();
+		for (int i = 0; i < position.size()/2; i = i +2) {
+			points.add(new Position(position.get(i), position.get(i+1)));
+		}
+		return points;
+	}
 	
+	@JsonIgnore
+	public void setPoints(List<Position> positions) {
+		List<Float> floats = new ArrayList<Float>();
+		for (Position p: positions) {
+			floats.add(p.getX());
+			floats.add(p.getY());
+		}
+		this.position = floats;
+	}
+
 	public int compareTo (Poi poi) {
 		if (poi.radius < radius) {
 			return -1;

@@ -21,6 +21,10 @@ public class Position {
 	private float y;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+	public Position(float x, float y) {
+		this.x = x;
+		this.y = y;
+	}
 	@JsonProperty("x")
 	public float getX() {
 		return x;
