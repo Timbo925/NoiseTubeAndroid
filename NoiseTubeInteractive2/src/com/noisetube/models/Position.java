@@ -1,7 +1,13 @@
 package com.noisetube.models;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
+import android.util.Log;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -63,6 +69,80 @@ public class Position {
 	@JsonAnySetter
 	public void setAdditionalProperty(String name, Object value) {
 		this.additionalProperties.put(name, value);
+	}
+
+	/**
+	 * @param positions - List of positions representing the polygon
+	 * @return - returns true if this point is inside the polygon. Otherwise false.
+	 */
+	public boolean insidePolygon(List<Position> positions) {
+
+		List<Float> polyX = new ArrayList<Float>();
+		List<Float> polyY = new ArrayList<Float>();
+
+		for (Position pos : positions) {
+			polyX.add(pos.x);
+			polyY.add(pos.y);
+		}
+
+		double minX = Collections.min(polyX);
+		double maxX = Collections.max(polyX);
+		double minY = Collections.min(polyY);
+		double maxY = Collections.max(polyY);
+
+		//Checking the outer bounds of the polygon. 
+		//If this isn't satisfied no furture calcuations are nessesary.
+
+		if (this.x < minX || this.x > maxX || this.y < minY || this.y > maxY) {
+			return false;
+		}
+
+		//Detection inside a list of of coordinates. Based on ras casting
+		//Code based on http://www.ecse.rpi.edu/
+		int i, j, c = 0;
+		int nvert = polyX.size();
+		for (i = 0, j = nvert-1; i < nvert; j = i++) {
+		//	System.out.println("j: " + j + " i: " + i + " polyY.i: " + polyY.get(i) + " polyY.j: " + polyY.get(j) + " polyX.i: " + polyX.get(i) + " polyX.j: " + polyX.get(j));
+			if ( ((polyY.get(i)>this.y) != (polyY.get(j)>this.y)) && 
+				 (this.x < (polyX.get(j)-polyX.get(i)) * (this.y-polyY.get(i)) 
+						 / (polyY.get(j)-polyY.get(i)) + polyX.get(i)) )
+				c++;
+		}
+		//System.out.println("c: " + c);
+		if (c % 2 == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	/**
+	 * 
+	 * @param position - Postion of a point to test
+	 * @param radius - Range of the given point in km
+	 * @return true if point in range of this point
+	 * 
+	 * Calculations based on 'The haversine formula'
+	 */
+	public boolean inRangePosition(Position position, int radius) {
+		double conv = Math.PI /180;
+		double piLat = position.x * conv ;
+		double piLon = position.y * conv;
+		double lamLat = this.x * conv;
+		double lamLon = this.y * conv;
+		double earthRadius = 6371;
+
+		double term1 = Math.pow(Math.sin(((piLon - piLat)/2)), 2);
+		double term2 = Math.sin(piLat) * Math.sin(piLon) *  Math.pow(Math.sin(((lamLon - lamLat) / 2)), 2);
+		double d = earthRadius * Math.asin(Math.sqrt(term1) + term2);
+
+		//System.out.println("Calcualted distance: " + d + " compared with: " + radius);
+
+
+		if (d < radius) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 
 }

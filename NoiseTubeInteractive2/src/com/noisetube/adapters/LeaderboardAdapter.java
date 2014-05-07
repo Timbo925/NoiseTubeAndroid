@@ -32,10 +32,12 @@ public class LeaderboardAdapter extends ArrayAdapter<LeaderboardEntry> {
 	}
 
 	public void setLeaderboardEntries(List<LeaderboardEntry> leaderboardEntriesIn) {
-		//Log.d("MyListAdapter", "Set dataset: " + leaderboardEntries);
+		Log.d("MyListAdapter", "Set dataset: " + leaderboardEntries);
 		leaderboardEntries.clear();
-		leaderboardEntries.addAll(leaderboardEntriesIn);
-		this.notifyDataSetChanged();
+		if (leaderboardEntriesIn != null) {
+			leaderboardEntries.addAll(leaderboardEntriesIn);
+			this.notifyDataSetChanged();
+		}
 	}
 	
 	@Override

@@ -2,6 +2,7 @@ package com.vub.storage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
@@ -60,7 +61,7 @@ public class PoiStorage {
 	
 	public void setPoiList(List<Poi> pois) {
 		ObjectMapper objectMapper = new ObjectMapper();
-		
+		Collections.sort(pois);
 		Log.d("PoiStorage" , "Stroing Poi List");
 		try {
 			storageEditor.putString(PARAM_SAVE, objectMapper.writeValueAsString(pois));

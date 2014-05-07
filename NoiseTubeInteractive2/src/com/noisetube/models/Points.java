@@ -12,6 +12,7 @@ public class Points implements Serializable {
 	private double multiplierTime;
 	private double multiplierSpecial;
 	public static final String POINTS = "POINTS";
+
 	
 	public String toJsonString() {
 		Gson gson = new Gson();

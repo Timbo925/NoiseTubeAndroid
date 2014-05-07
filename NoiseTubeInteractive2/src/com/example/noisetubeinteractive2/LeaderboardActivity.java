@@ -36,6 +36,7 @@ import com.noisetube.main.JsonResponse;
 import com.noisetube.main.ServerConnection;
 import com.noisetube.models.LeaderboardEntry;
 import com.noisetube.models.LeaderboardType;
+import com.vub.storage.LeaderboardStorage;
 
 public class LeaderboardActivity extends Activity implements
 ActionBar.TabListener {
@@ -194,6 +195,7 @@ ActionBar.TabListener {
 
 		private LeaderboardAdapter adapter;
 		private ListView listView;
+		private LeaderboardStorage leaderboardStorage;
 		
 		public static final String TYPE = "leaderboard_type";
 
@@ -221,12 +223,18 @@ ActionBar.TabListener {
 
 			LeaderboardType type = (LeaderboardType) getArguments().getSerializable(TYPE);
 			System.out.println("Get Type: " + type);
+			
+			leaderboardStorage = new LeaderboardStorage(getActivity(), type);
 
 			//Configure the list view
 			listView = (ListView)  rootView.findViewById(R.id.leaderboard_listview_score);
 			
 			// Building custom adapter to be used
 			adapter = new LeaderboardAdapter(new ArrayList<LeaderboardEntry>(), getActivity(), type);
+			List<LeaderboardEntry> list = leaderboardStorage.getLeaderboardEntries();
+			adapter.setLeaderboardEntries(list);
+
+			
 			Log.d("onCreateView", "Adapter build and set");
 			
 			listView.setAdapter(adapter);
@@ -269,6 +277,8 @@ ActionBar.TabListener {
 					try {
 						List<LeaderboardEntry> leaderboardEntries = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<LeaderboardEntry>>(){});
 						System.out.println("Leaderboard Entrys from server: " + leaderboardEntries);
+						
+						leaderboardStorage.setPoiList(leaderboardEntries);
 						
 						adapter.setLeaderboardEntries(leaderboardEntries);
 						Log.d("GetLeaderboard", "Notifying adapterof data set changed");
