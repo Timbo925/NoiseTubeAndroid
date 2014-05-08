@@ -1,14 +1,14 @@
 package com.noisetube.main;
 
 import android.app.IntentService;
-import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
 import android.util.Log;
 
 import com.example.noisetubeinteractive2.MainActivity.DbResponse;
 import com.example.noisetubeinteractive2.MainActivity.FinalDbResponse;
-import com.google.gson.Gson;
 
 public class SoundMeasurementService extends IntentService {
 
@@ -27,8 +27,8 @@ public class SoundMeasurementService extends IntentService {
 	private boolean isStoped = false;
 	private static final long measurmentsSecond = 1000;
 	private SoundMeasurement soundMeasurement = new SoundMeasurement();
-	private PointMeasurement pointMeasurement = new PointMeasurement();
-	
+	private PointMeasurement pointMeasurement;
+	private Context context;
 
 	public SoundMeasurementService() {
 		super("SoundMeasurementService");
@@ -57,8 +57,10 @@ public class SoundMeasurementService extends IntentService {
 			Log.v("onHandleIntent", "STOP Command received");
 			return; 
 		}
+		
+		
 		soundMeasurement = new SoundMeasurement();
-		pointMeasurement = new PointMeasurement();
+		pointMeasurement = new PointMeasurement(this);
 		
 		long oldTime = SystemClock.elapsedRealtime();
 		while (!isStoped) {

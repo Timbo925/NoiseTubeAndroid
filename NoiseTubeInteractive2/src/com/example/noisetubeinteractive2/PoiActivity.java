@@ -82,12 +82,14 @@ public class PoiActivity extends Activity {
 			
 			adapter = new PoiAdapter(new ArrayList<Poi>(), getActivity());
 			
-			if( poiStorage.getPoiList() == null ) {
-				GetPoi loadPois = new GetPoi();
-				loadPois.execute("poi/50.8637829/4.418763/10" , "");
-			} else {
-				Log.d("PoiActivity", "Using Local Poi");
+			try {
 				adapter.setPois(poiStorage.getPoiList());
+				Log.d("PoiActivity", "Using Local Poi");
+				poiStorage.update();
+//				GetPoi loadPois = new GetPoi();
+//				loadPois.execute("poi/50.8637829/4.418763/10" , "");			
+			} catch (NullPointerException e) {
+				Log.i("PoiActivity onCreateView", "No pois found in database, update poiStorage");
 				GetPoi loadPois = new GetPoi();
 				loadPois.execute("poi/50.8637829/4.418763/10" , "");
 			}
@@ -133,8 +135,7 @@ public class PoiActivity extends Activity {
 						
 						Log.d("GetPoi", "Notifying adapterof data set changed");
 						adapter.setPois(pois);
-						
-						
+		
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

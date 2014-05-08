@@ -124,19 +124,18 @@ public class Position {
 	 * Calculations based on 'The haversine formula'
 	 */
 	public boolean inRangePosition(Position position, int radius) {
-		double conv = Math.PI /180;
-		double piLat = position.x * conv ;
-		double piLon = position.y * conv;
-		double lamLat = this.x * conv;
-		double lamLon = this.y * conv;
-		double earthRadius = 6371;
-
-		double term1 = Math.pow(Math.sin(((piLon - piLat)/2)), 2);
-		double term2 = Math.sin(piLat) * Math.sin(piLon) *  Math.pow(Math.sin(((lamLon - lamLat) / 2)), 2);
-		double d = earthRadius * Math.asin(Math.sqrt(term1) + term2);
-
-		//System.out.println("Calcualted distance: " + d + " compared with: " + radius);
-
+		
+		double toRad = Math.PI / 180;
+		int R = 6371;
+		double p1 = position.x * toRad;
+		double p2 = this.x * toRad;
+		double deltaP = (this.x - position.x) * toRad;
+		double deltaL = (this.y - position.y) * toRad;
+		double a =  (Math.sin(deltaP / 2) * Math.sin(deltaP/2)) + (Math.cos(p1) * Math.cos(p2) * Math.sin(deltaL / 2) * Math.sin(deltaL/2));
+		double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+		double d =  R * c;
+		
+		//System.out.println("Calcualted distance: " + d + " compared with radious: " + radius + " Point 1: " + this.x + "/" + this.y + " Point2 " + position.x + "/" + position.y);
 
 		if (d < radius) {
 			return true;

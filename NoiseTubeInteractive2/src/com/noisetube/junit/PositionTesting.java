@@ -11,22 +11,21 @@ import com.noisetube.models.Position;
 
 public class PositionTesting extends TestCase {
 
-	Position position = new Position(0, 0);
-	Position position2 = new Position(0, 2);
-	Position position3 = new Position(2, 0);
-	Position position4 = new Position(2, 2);
-	Position position5 = new Position(2, 1);
 
 	@Test
 	public void testInside() {
 		//112 km uit elkaar
-		assertTrue(position.inRangePosition(position2, 12222));
+		Position position = new Position(0, 0);
+		Position position2 = new Position(0, 1);
+		assertTrue(position.inRangePosition(position2, 122));
 	}
 	
 	@Test
 	public void testOutside() {
 		//112 km uit elkaar
-		assertFalse(position.inRangePosition(position2, 11));
+		Position position = new Position(0, 0);
+		Position position2 = new Position(0, 1);
+		assertFalse(position.inRangePosition(position2, 1));
 	}
 	
 	@Test

@@ -8,6 +8,7 @@ import java.util.List;
 import org.apache.http.client.ClientProtocolException;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -18,30 +19,39 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noisetube.adapters.PoiAdapter;
 import com.noisetube.main.JsonResponse;
 import com.noisetube.main.ServerConnection;
+import com.noisetube.models.OnTaskCompleted;
 import com.noisetube.models.Poi;
 
 public class PoiStorage {
 
 	private SharedPreferences storage;
-	private Activity activity;
+//	private Activity activity; //Might be null
 	private SharedPreferences.Editor storageEditor;
 	private List<Poi> pois = new ArrayList<Poi>();
 	private PoiAdapter poiAdapter = null;
 	private static final String PARAM_SAVE = "PointOfIntrestStorage";
+	private Context context;
+	private OnTaskCompleted task = null;
 	
 	//String statsString = storage.getString(Stats.STATS, null);
 	
-	public PoiStorage(Activity activity) {
-		this.activity = activity;
-		storage = activity.getSharedPreferences("prefs", 0);
+//	public PoiStorage(Activity activity) {
+//		this.activity = activity;
+//		storage = activity.getSharedPreferences("prefs", 0);
+//		storageEditor = storage.edit();
+//	}
+
+	public PoiStorage(Context context) {
+		this.context = context;
+		storage = context.getSharedPreferences("prefs", 0);
 		storageEditor = storage.edit();
 	}
-	
-	
-	public List<Poi> getPoiList() {
+
+
+	public List<Poi> getPoiList() throws NullPointerException {
 		String jsonString = storage.getString(PARAM_SAVE, null);
 		if (jsonString == null) {
-			return null;
+			throw new NullPointerException();
 		} else {
 			ObjectMapper mapper = new ObjectMapper();
 			List<Poi> pois;
@@ -62,7 +72,7 @@ public class PoiStorage {
 	public void setPoiList(List<Poi> pois) {
 		ObjectMapper objectMapper = new ObjectMapper();
 		Collections.sort(pois);
-		Log.d("PoiStorage" , "Stroing Poi List");
+		Log.d("PoiStorage" , "Stroing Poi List: " + pois);
 		try {
 			storageEditor.putString(PARAM_SAVE, objectMapper.writeValueAsString(pois));
 			storageEditor.apply();	
@@ -76,7 +86,7 @@ public class PoiStorage {
 		@Override
 		protected JsonResponse doInBackground(String... params) {
 			Log.d("GetPoi", "Starting backgound");
-			ServerConnection serverConnection = (ServerConnection) activity.getApplication();
+			ServerConnection serverConnection = (ServerConnection) context.getApplicationContext();
 			JsonResponse jsonResponse = new JsonResponse();
 			try {
 
@@ -102,8 +112,12 @@ public class PoiStorage {
 					//Log.d("GetPoi", jsonResponse.getMessage());
 					List<Poi> pois2 = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<Poi>>(){});
 					System.out.println("POI Entrys from server: " + pois2);
-					pois = pois2;
-					
+					//pois = pois2;
+					setPoiList(pois2);
+					if (task != null) {
+						task.onTaskCompleted();
+						task = null;
+					}
 					
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -112,6 +126,17 @@ public class PoiStorage {
 			}
 		}
 
+	}
+
+	public void update() {
+		GetPoi getPoi = new GetPoi();
+		getPoi.execute("poi/50.8637829/4.418763/10" , ""); //TODO update with real location and radius
+	}
+
+
+	public void updateCallback(OnTaskCompleted task) {
+		this.task = task;
+		update();
 	}
 	
 	

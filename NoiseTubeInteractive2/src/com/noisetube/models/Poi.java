@@ -1,5 +1,6 @@
 package com.noisetube.models;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 
 
-public class Poi implements Comparable<Poi>{
+public class Poi implements Comparable<Poi>, Serializable {
 
 	private int idPoi;
 	private String name;
@@ -18,12 +19,12 @@ public class Poi implements Comparable<Poi>{
 	private int bonusPoints;
 	private float bonusMulti;
 	private int radius;
-	private String type;
 	private Double distance;
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+	private String type;
 
 	@JsonIgnore
-	public List<Position> getPoints() {
+	public List<Position> getPositions() {
 		List<Position> points = new ArrayList<Position>();
 		for (int i = 0; i < position.size()/2; i = i +2) {
 			points.add(new Position(position.get(i), position.get(i+1)));
