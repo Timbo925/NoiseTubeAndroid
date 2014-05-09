@@ -8,6 +8,11 @@ import org.apache.http.client.ClientProtocolException;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.location.Criteria;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,7 +28,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noisetube.adapters.PoiAdapter;
 import com.noisetube.main.JsonResponse;
 import com.noisetube.main.ServerConnection;
-import com.noisetube.models.LeaderboardEntry;
 import com.noisetube.models.Poi;
 import com.vub.storage.PoiStorage;
 
@@ -36,7 +40,7 @@ public class PoiActivity extends Activity {
 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PoiFragment()).commit();
+			.add(R.id.container, new PoiFragment()).commit();
 		}
 	}
 
@@ -63,41 +67,86 @@ public class PoiActivity extends Activity {
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	public static class PoiFragment extends Fragment {
+	public static class PoiFragment extends Fragment implements LocationListener {
 
 		private PoiStorage poiStorage; 
 		private PoiAdapter adapter;
 		private ListView listView;
-		
+		private LocationManager locationManager;
+		private String provider;
+		private Location location;
+		private Location locationBase;
+
 		public PoiFragment() {
 		}
 
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_poi, container,false);
-			
+
 			Log.d("PoiFragment", "Creating View");
 			poiStorage = new PoiStorage(getActivity());
 			listView = (ListView) rootView.findViewById(R.id.poi_listView);
-			
+
 			adapter = new PoiAdapter(new ArrayList<Poi>(), getActivity());
 			
+			//Setting up location manager with corresponding criteria
+			locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+			Criteria criteria = new Criteria();
+			provider = locationManager.getBestProvider(criteria, false);
+			location = locationManager.getLastKnownLocation(provider);
+			locationBase = location;
+
 			try {
 				adapter.setPois(poiStorage.getPoiList());
 				Log.d("PoiActivity", "Using Local Poi");
-				poiStorage.update();
-//				GetPoi loadPois = new GetPoi();
-//				loadPois.execute("poi/50.8637829/4.418763/10" , "");			
+
+				//Loading new points based on last known location
+				GetPoi loadPois = new GetPoi();
+				loadPois.execute("poi/"+ location.getLatitude() +"/"+ location.getLongitude()+"/10" , "");			
 			} catch (NullPointerException e) {
 				Log.i("PoiActivity onCreateView", "No pois found in database, update poiStorage");
 				GetPoi loadPois = new GetPoi();
-				loadPois.execute("poi/50.8637829/4.418763/10" , "");
+				loadPois.execute("poi/"+ location.getLatitude() +"/"+ location.getLongitude()+"/10" , "");		
 			}
 
 			listView.setAdapter(adapter);
 			return rootView;
 		}
-		
+
+		/**
+		 * If the location changed more than 2 km we ask for new Poi from the server. Adapter will be updated
+		 * @param location
+		 */
+		@Override
+		public void onLocationChanged(Location location) {
+			if (location.distanceTo(locationBase) > 2) {
+				locationBase = location;
+				GetPoi loadPois = new GetPoi();
+				loadPois.execute("poi/"+ location.getLatitude() +"/"+ location.getLongitude()+"/10" , "");		
+			}		
+		}
+
+		@Override
+		public void onProviderDisabled(String provider) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onProviderEnabled(String provider) {
+			// TODO Auto-generated method stub
+
+		}
+
+		@Override
+		public void onStatusChanged(String provider, int status, Bundle extras) {
+			// TODO Auto-generated method stub
+
+		}
+
+
+		//Updating the poi list and informing adapter when changed
 		public class GetPoi extends AsyncTask<String, Void, JsonResponse> {
 
 			@Override
@@ -129,17 +178,17 @@ public class PoiActivity extends Activity {
 						//Log.d("GetPoi", jsonResponse.getMessage());
 						List<Poi> pois = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<Poi>>(){});
 						//System.out.println("POI Entrys from server: " + pois);
-						
+
 						//If offline only local storage will be used
 						poiStorage.setPoiList(pois);
-						
+
 						Log.d("GetPoi", "Notifying adapterof data set changed");
 						adapter.setPois(pois);
-		
+
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-					
+
 				}
 			}
 

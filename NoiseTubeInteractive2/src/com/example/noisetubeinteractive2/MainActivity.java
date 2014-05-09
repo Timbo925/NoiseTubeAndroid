@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.noisetube.main.JsonResponse;
+import com.noisetube.main.LocationMeasurment;
 import com.noisetube.main.PointMeasurement;
 import com.noisetube.main.ServerConnection;
 import com.noisetube.main.SoundMeasurement;
@@ -136,9 +137,12 @@ public class MainActivity extends Activity {
 				TextView textPointsTotal = (TextView) frag.getView().findViewById(R.id.home_points_total);
 				TextView textMulti  = (TextView) frag.getView().findViewById(R.id.home_multi_loc);
 				TextView textMultiBonus = (TextView) frag.getView().findViewById(R.id.home_multi_bonus);
+				TextView textLocation = (TextView) frag.getView().findViewById(R.id.home_location);
 				
 				SoundMeasurement soundMeasurement = (SoundMeasurement) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_SOUNDM);
 				PointMeasurement pointMeasurement = (PointMeasurement) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_POINTM);
+				LocationMeasurment locationMeasurment = (LocationMeasurment) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_LOCATIONM);
+				
 				System.out.println(pointMeasurement);
 				textDbMax.setText(Integer.toString(soundMeasurement.getDbMax()) + dbText);
 				textDbMin.setText(Integer.toString(soundMeasurement.getDbMin()) + dbText);
@@ -149,6 +153,7 @@ public class MainActivity extends Activity {
 				textMultiBonus.setText(Integer.toString(pointMeasurement.getBonusPoints()));
 				textMulti.setText(Double.toString(pointMeasurement.getLocationMultiplier()));
 				textPointsTotal.setText(Integer.toString(pointMeasurement.getTotalPoints()));
+				textLocation.setText("(" + Double.toString(locationMeasurment.getLastLat()) + ";" + Double.toString(locationMeasurment.getLastLon()) + ")" );
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -168,12 +173,17 @@ public class MainActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			SoundMeasurement soundMeasurement = (SoundMeasurement) intent.getExtras().getSerializable(SoundMeasurementService.PARAM_OUT_SOUNDM);
+			LocationMeasurment locationMeasurment = (LocationMeasurment) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_LOCATIONM);
+			PointMeasurement pointMeasurement = (PointMeasurement) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_POINTM);
 
 			Gson gson = new Gson();
-			System.out.println(gson.toJson(soundMeasurement).toString());
+			Log.i("FinalDbResponse: ", gson.toJson(soundMeasurement).toString());
+			Log.i("FinalDbResponse: ", gson.toJson(locationMeasurment).toString());
+			Log.i("FinalDbResponse: ", gson.toJson(pointMeasurement).toString());
+			
 
-			PostSoundMeasurement postSoundMeasurement = new PostSoundMeasurement();
-			postSoundMeasurement.execute(soundMeasurement);
+			PostSoundMeasurement postSoundMeasurement = new PostSoundMeasurement(soundMeasurement, pointMeasurement, locationMeasurment);
+			postSoundMeasurement.execute();
 		}
 	}	
 
@@ -230,10 +240,19 @@ public class MainActivity extends Activity {
 	 * @author Tim
 	 *
 	 */
-	public class PostSoundMeasurement extends AsyncTask<SoundMeasurement, Void, JsonResponse> {
+	public class PostSoundMeasurement extends AsyncTask<Void, Void, JsonResponse> {
+		private SoundMeasurement soundMeasurement;
+		private PointMeasurement pointMeasurement;
+		private LocationMeasurment locationMeasurment;
+		
+		public PostSoundMeasurement(SoundMeasurement soundMeasurement,PointMeasurement pointMeasurement,LocationMeasurment locationMeasurment) {
+			this.soundMeasurement = soundMeasurement;
+			this.locationMeasurment = locationMeasurment;
+			this.pointMeasurement = pointMeasurement;
+		}
 
 		@Override
-		protected JsonResponse doInBackground(SoundMeasurement... arg) {
+		protected JsonResponse doInBackground(Void... arg) {
 			String url = "http://nuNogNiet";		
 			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();

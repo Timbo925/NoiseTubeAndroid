@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Poi implements Comparable<Poi>, Serializable {
 
+
+
 	private int idPoi;
 	private String name;
 	private List<Float> position = new ArrayList<Float>();
@@ -30,6 +32,13 @@ public class Poi implements Comparable<Poi>, Serializable {
 			points.add(new Position(position.get(i), position.get(i+1)));
 		}
 		return points;
+	}
+	
+	@Override
+	public String toString() {
+		return "Poi [idPoi=" + idPoi + ", name=" + name + ", bonusPoints="
+				+ bonusPoints + ", bonusMulti=" + bonusMulti + ", radius="
+				+ radius + ", distance=" + distance + ", type=" + type + "]";
 	}
 	
 	@JsonIgnore

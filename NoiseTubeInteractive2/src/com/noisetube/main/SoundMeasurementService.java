@@ -4,6 +4,9 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationListener;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -19,15 +22,17 @@ public class SoundMeasurementService extends IntentService {
 	public static final String PARAM_OUT_MIN = "outMsg db Minimum SoundMeasurementService";
 	public static final String PARAM_OUT_MAX = "outMsg db Maximum SoundMeasurementService";
 	public static final String PARAM_OUT_TIME = "outMsg total time SoundMeasurementService";
-	public static final String PARAM_OUT_SOUNDM = "outMsg SoundMeasurement in Json SoundMeasurementService";
 	public static final String PARAM_COMMAND = "command";
 	public static final String PARAM_STOP_COMMAND = "stop";
-	public static final String PARAM_OUT_POINTM = "outMsg PointMeasurement";
+	public static final String PARAM_OUT_POINTM = "PointMeasurement Serialized";
+	public static final String PARAM_OUT_LOCATIONM = "LocationMeasurment Serialized";
+	public static final String PARAM_OUT_SOUNDM = "SoundMeasurement Serialized";
 	
 	private boolean isStoped = false;
 	private static final long measurmentsSecond = 1000;
 	private SoundMeasurement soundMeasurement = new SoundMeasurement();
 	private PointMeasurement pointMeasurement;
+	private LocationMeasurment locationMeasurment;
 	private Context context;
 
 	public SoundMeasurementService() {
@@ -61,20 +66,25 @@ public class SoundMeasurementService extends IntentService {
 		
 		soundMeasurement = new SoundMeasurement();
 		pointMeasurement = new PointMeasurement(this);
+		locationMeasurment = new LocationMeasurment(this);
 		
+		//Loop and refresches all elements. Results are broadcasted so they can be displayerd
 		long oldTime = SystemClock.elapsedRealtime();
 		while (!isStoped) {
 			while ((SystemClock.elapsedRealtime() - oldTime) < measurmentsSecond) {
 				
 			}
+			locationMeasurment.measure();
 			soundMeasurement.measure();	
-			pointMeasurement.measure();
+			pointMeasurement.measure(locationMeasurment.getLastLat() , locationMeasurment.getLastLon());
+			
 			//Creating broadcast
 			Intent broadcastIntent = new Intent();
 			broadcastIntent.setAction(DbResponse.ACTION_RESP);
 			broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 			broadcastIntent.putExtra(PARAM_OUT_SOUNDM, soundMeasurement);
 			broadcastIntent.putExtra(PARAM_OUT_POINTM, pointMeasurement);
+			broadcastIntent.putExtra(PARAM_OUT_LOCATIONM, locationMeasurment);
 			sendBroadcast(broadcastIntent);
 			oldTime = SystemClock.elapsedRealtime();
 		}
@@ -84,6 +94,7 @@ public class SoundMeasurementService extends IntentService {
 		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);
 		broadcastIntent.putExtra(PARAM_OUT_SOUNDM, soundMeasurement);
 		broadcastIntent.putExtra(PARAM_OUT_POINTM, pointMeasurement);
+		broadcastIntent.putExtra(PARAM_OUT_LOCATIONM, locationMeasurment);
 		sendBroadcast(broadcastIntent);
 		//TODO steps when stop measuring
 		this.stopSelf();

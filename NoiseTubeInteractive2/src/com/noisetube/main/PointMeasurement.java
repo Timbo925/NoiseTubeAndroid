@@ -27,13 +27,14 @@ public class PointMeasurement implements Serializable {
 		this.context = context;
 		System.out.println("PoiStorage with context");
 		poiStorage = new PoiStorage(context);
+		poiStorage.update();
 	}
 
 	public int getTotalPoints() {
 		return (int) (points + bonusPoints);
 	}
 
-	public void measure() {
+	public void measure(double lat, double lon) {
 		//TODO - get location
 		//	   - inside POI?
 		try {
@@ -41,7 +42,7 @@ public class PointMeasurement implements Serializable {
 			Log.d("PointMeasurement.measure", "The Poi List: " + pois );
 			double multi = 1;
 			for (Poi poi: pois) {
-				Position tesetPos = new Position(50.8637829f,4.418763f);
+				Position tesetPos = new Position((float) lat, (float) lon);
 				//System.out.println(poi.getBonusMulti());
 				boolean inside = false;
 				if (poi.getPosition().size() > 2) {
@@ -49,7 +50,7 @@ public class PointMeasurement implements Serializable {
 					inside = tesetPos.insidePolygon(poi.getPositions());
 					//Log.d("PointMeasurment", "Polygon test: " + inside + " poiId: " + poi.getIdPoi());
 				} else if (poi.getPosition().size() == 2) {
-					inside = tesetPos.inRangePosition(poi.getPositions().get(0), 5);
+					inside = tesetPos.inRangePosition(poi.getPositions().get(0), poi.getRadius());
 					//Log.d("PointMeasurment", "Point test: " + inside + " poiId: " + poi.getIdPoi());
 				} else {
 					inside = false;
@@ -57,6 +58,7 @@ public class PointMeasurement implements Serializable {
 				}
 				
 				if (inside) {
+					Log.d("PointMeasurment", "Inside Poi: " + poi);
 				//	System.out.println("Recieved List: " + poiIds);
 					multi += poi.getBonusMulti();
 					//System.out.println("New Multi: " + multi);
@@ -70,7 +72,7 @@ public class PointMeasurement implements Serializable {
 				}
 			}
 			
-			System.out.println("Adding Points: " + 1*multi + " Real Points: " + pointsReal);
+			//System.out.println("Adding Points: " + 1*multi + " Real Points: " + pointsReal);
 			pointsReal += 1 * multi;
 			points = (int) pointsReal; //We round the points number for better looks
 			locationMultiplier = Math.round(multi * 100.0) / 100.0;
