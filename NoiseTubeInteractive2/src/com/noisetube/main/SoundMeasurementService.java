@@ -89,6 +89,7 @@ public class SoundMeasurementService extends IntentService {
 			oldTime = SystemClock.elapsedRealtime();
 		}
 		
+		locationMeasurment.stop();
 		Intent broadcastIntent = new Intent();
 		broadcastIntent.setAction(FinalDbResponse.ACTION_RESP);
 		broadcastIntent.addCategory(Intent.CATEGORY_DEFAULT);

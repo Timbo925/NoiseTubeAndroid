@@ -41,16 +41,22 @@ public class LocationMeasurment implements LocationListener, Serializable {
 	    lastLat = location.getLatitude();
 		lastLon = location.getLongitude();
 		accuracy.add(location.getAccuracy());
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 	    
 	}
 	
 	void measure () {
+		
 		locationList.add(location.getLatitude());
 		locationList.add(location.getLongitude());
 		accuracy.add(location.getAccuracy());
 		lastLat = location.getLatitude();
 		lastLon = location.getLongitude();
-		//Log.d("LocatinMeasurment", "Location: " + location.getLatitude() + "/" + location.getLongitude() + " with provider: " + provider);
+		Log.d("LocatinMeasurment", "Location: " + location.getLatitude() + "/" + location.getLongitude() + " with provider: " + provider + " and accuracy: " + location.getAccuracy());
+	}
+	
+	void stop() {
+		locationManager.removeUpdates(this);
 	}
 
 	@Override

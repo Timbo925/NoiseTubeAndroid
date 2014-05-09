@@ -1,5 +1,9 @@
 package com.example.noisetubeinteractive2;
 
+import java.io.IOException;
+
+import org.apache.http.client.ClientProtocolException;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
@@ -7,9 +11,11 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -191,6 +197,18 @@ public class MainActivity extends Activity {
 
 	public void startMeasuring(View view) {
 		//Intent mServiceIntent;
+		
+		LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
+		boolean enabled = service .isProviderEnabled(LocationManager.GPS_PROVIDER);
+
+		// check if enabled and if not send user to the GSP settings
+		// Better solution would be to display a dialog and suggesting to 
+		// go to the settings
+		if (!enabled) {
+		  Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+		  startActivity(intent);
+		} 
+		
 		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
@@ -257,7 +275,11 @@ public class MainActivity extends Activity {
 			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();
 			Gson gson = new Gson();		
-			jsonResponse = serverConnection.post(url, gson.toJson(arg[0]).toString());
+			try {
+				jsonResponse = serverConnection.post(url);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 			return jsonResponse;		
 		}
 
