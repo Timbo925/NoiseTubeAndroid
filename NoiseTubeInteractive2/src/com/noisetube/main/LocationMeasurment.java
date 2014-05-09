@@ -4,80 +4,100 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.location.LocationClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+
 import android.content.Context;
-import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.Log;
 
-public class LocationMeasurment implements LocationListener, Serializable {
+public class LocationMeasurment implements Serializable, GooglePlayServicesClient.ConnectionCallbacks,GooglePlayServicesClient.OnConnectionFailedListener,LocationListener {
 
-	
-	
+
+
 	private static final long serialVersionUID = 8406332998661787571L;
 	//transient allows values to be excluded in serialization
 	private transient Context context;
 	private List<Double> locationList = new ArrayList<Double>();
 	private List<Float> accuracy = new ArrayList<Float>();
-	private double lastLat;
-	private double lastLon;
-	private transient LocationManager locationManager;
-	private String provider;
+	private double lastLat = 0.0;
+	private double lastLon = 0.0;
+	//private transient LocationManager locationManager;
+	//private String provider;
 	private transient Location location;
-	
+
+	private transient LocationClient locationclient;
+	private transient LocationRequest locationrequest;
+	boolean connected = false;
+
 	public LocationMeasurment(Context context) {
 		this.context = context;
 		Log.i("LocationMeasurment", "LocationManager created with context: " + context);
-		
-		// Retrieving the location manager
-		locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-		// Setting up cretaria for the location managers
-		Criteria criteria = new Criteria();
-	    provider = locationManager.getBestProvider(criteria, false);
-	    //Updating to last known location. Might not be accurate in the beginning
-	    location = locationManager.getLastKnownLocation(provider);
-	    lastLat = location.getLatitude();
-		lastLon = location.getLongitude();
-		accuracy.add(location.getAccuracy());
-		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-	    
+		locationclient = new LocationClient(context, this, this);
+		locationclient.connect();
+
+
 	}
+
+	void start() {
 	
+	}
+
 	void measure () {
-		
-		locationList.add(location.getLatitude());
-		locationList.add(location.getLongitude());
-		accuracy.add(location.getAccuracy());
-		lastLat = location.getLatitude();
-		lastLon = location.getLongitude();
-		Log.d("LocatinMeasurment", "Location: " + location.getLatitude() + "/" + location.getLongitude() + " with provider: " + provider + " and accuracy: " + location.getAccuracy());
+		if (connected) {
+			Log.d("LocationMeasurment", "Measuring");
+			locationList.add(location.getLatitude());
+			locationList.add(location.getLongitude());
+			accuracy.add(location.getAccuracy());
+			lastLat = location.getLatitude();
+			lastLon = location.getLongitude();
+			Log.d("LocatinMeasurment", "Location: " + location.getLatitude() + "/" + location.getLongitude() + " and accuracy: " + location.getAccuracy());
+		} else {
+			Log.d("LocatinMeasurment", "Not Connected");
+		}
+
 	}
-	
+
 	void stop() {
-		locationManager.removeUpdates(this);
+		locationclient.disconnect();
 	}
 
 	@Override
 	public void onLocationChanged(Location location) {
-		//Keeping location up to date on change.
-		Log.d("LocatinMeasurment", "New Location: " + location.getLatitude() + "/" + location.getLongitude() + " with provider: " + provider);
-		this.location = location;
-		//TODO update the list
+		if(location!=null){
+			Log.i("LocationMeasurment", "Location Request on Change:" + location.getLatitude() + "," + location.getLongitude());
+			this.location = location;
+		}
 	}
 
 	@Override
-	public void onProviderDisabled(String provider) {
-		
+	public void onConnectionFailed(ConnectionResult arg0) {
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
-	public void onProviderEnabled(String provider) {
+	public void onConnected(Bundle arg0) {
+		// TODO Auto-generated method stub
+		Log.i("LocationMeasurment", "Connected");
+		locationrequest = LocationRequest.create();
+		locationrequest.setInterval(100);
+		locationclient.requestLocationUpdates(locationrequest, this);
+		location = locationclient.getLastLocation();
+		Log.i("LocationMeasurment", "Last Known Location :" + location.getLatitude() + "," + location.getLongitude());
+		connected = true;
+
 	}
 
 	@Override
-	public void onStatusChanged(String provider, int status, Bundle extras) {	
+	public void onDisconnected() {
+		// TODO Auto-generated method stub
+
 	}
 
 	/**

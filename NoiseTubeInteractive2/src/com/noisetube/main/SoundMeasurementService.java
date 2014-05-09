@@ -68,6 +68,8 @@ public class SoundMeasurementService extends IntentService {
 		pointMeasurement = new PointMeasurement(this);
 		locationMeasurment = new LocationMeasurment(this);
 		
+		locationMeasurment.start();
+		
 		//Loop and refresches all elements. Results are broadcasted so they can be displayerd
 		long oldTime = SystemClock.elapsedRealtime();
 		while (!isStoped) {
