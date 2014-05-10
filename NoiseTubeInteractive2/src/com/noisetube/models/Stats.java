@@ -2,86 +2,113 @@ package com.noisetube.models;
 
 import java.io.Serializable;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.gson.Gson;
 
-import android.content.SharedPreferences;
-
 public class Stats implements Serializable{
-	
-	private int level;
-	private int exp;
-	private int expMax;
-	private int amount;
-	private int time;
-	
+
+	@JsonProperty("idStats")
+	private Integer idStats;
+	@JsonProperty("exp")
+	private Integer exp;
+	@JsonProperty("level")
+	private Integer level;
+	@JsonProperty("amountMeasurments")
+	private Integer amountMeasurments;
+	@JsonProperty("totalTime")
+	private String totalTime;
+	@JsonProperty("maxExp")
+	private Integer maxExp;
+	@JsonProperty("nextLevel")
+	private Integer nextLevel;
+	@JsonProperty("lastLevel")
+	private Integer lastLevel;
+
 	private static final long serialVersionUID = 1705459163208937073L;
 	public static final String STATS = "STATS";
-	
+
 	public String toJsonString() {
 		Gson gson = new Gson();
 		return gson.toJson(this).toString();
 	}
-	/**
-	 * @return the level
-	 */
-	public int getLevel() {
-		return level;
+
+	@JsonProperty("lastLevel")
+	public Integer getLastLevel() {
+		return lastLevel;
 	}
-	/**
-	 * @param level the level to set
-	 */
-	public void setLevel(int level) {
-		this.level = level;
+	
+	@JsonProperty("lastLevel")
+	public void setLastLevel(Integer lastLevel) {
+		this.lastLevel = lastLevel;
 	}
-	/**
-	 * @return the exp
-	 */
-	public int getExp() {
+
+	@JsonProperty("nextLevel")
+	public Integer getNextLevel() {
+		return nextLevel;
+	}
+	
+	@JsonProperty("nextLevel")
+	public void setNextLevel(Integer netxLevel) {
+		this.nextLevel = netxLevel;
+	}
+
+	@JsonProperty("idStats")
+	public Integer getIdStats() {
+		return idStats;
+	}
+
+	@JsonProperty("idStats")
+	public void setIdStats(Integer idStats) {
+		this.idStats = idStats;
+	}
+
+	@JsonProperty("exp")
+	public Integer getExp() {
 		return exp;
 	}
-	/**
-	 * @param exp the exp to set
-	 */
-	public void setExp(int exp) {
+
+	@JsonProperty("exp")
+	public void setExp(Integer exp) {
 		this.exp = exp;
 	}
-	/**
-	 * @return the expMax
-	 */
-	public int getExpMax() {
-		return expMax;
+
+	@JsonProperty("level")
+	public Integer getLevel() {
+		return level;
 	}
-	/**
-	 * @param expMax the expMax to set
-	 */
-	public void setExpMax(int expMax) {
-		this.expMax = expMax;
+
+	@JsonProperty("level")
+	public void setLevel(Integer level) {
+		this.level = level;
 	}
-	/**
-	 * @return the amount
-	 */
-	public int getAmount() {
-		return amount;
+
+	@JsonProperty("amountMeasurments")
+	public Integer getAmountMeasurments() {
+		return amountMeasurments;
 	}
-	/**
-	 * @param amount the amount to set
-	 */
-	public void setAmount(int amount) {
-		this.amount = amount;
+
+	@JsonProperty("amountMeasurments")
+	public void setAmountMeasurments(Integer amountMeasurments) {
+		this.amountMeasurments = amountMeasurments;
 	}
-	/**
-	 * @return the time
-	 */
-	public int getTime() {
-		return time;
+
+	@JsonProperty("totalTime")
+	public String getTotalTime() {
+		return totalTime;
 	}
-	/**
-	 * @param time the time to set
-	 */
-	public void setTime(int time) {
-		this.time = time;
+
+	@JsonProperty("totalTime")
+	public void setTotalTime(String totalTime) {
+		this.totalTime = totalTime;
 	}
-	
-	
-	
+
+	@JsonProperty("maxExp")
+	public Integer getMaxExp() {
+		return maxExp;
+	}
+
+	@JsonProperty("maxExp")
+	public void setMaxExp(Integer maxExp) {
+		this.maxExp = maxExp;
+	}
 }

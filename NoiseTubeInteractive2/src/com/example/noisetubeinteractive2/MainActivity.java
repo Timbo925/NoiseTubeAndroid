@@ -2,13 +2,13 @@ package com.example.noisetubeinteractive2;
 
 import java.io.IOException;
 
-import org.apache.http.client.ClientProtocolException;
-
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.LocationManager;
@@ -27,6 +27,10 @@ import android.widget.Chronometer;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.noisetube.main.JsonResponse;
 import com.noisetube.main.LocationMeasurment;
@@ -35,6 +39,7 @@ import com.noisetube.main.ServerConnection;
 import com.noisetube.main.SoundMeasurement;
 import com.noisetube.main.SoundMeasurementService;
 import com.noisetube.models.Points;
+import com.noisetube.models.PostRequest;
 import com.noisetube.models.PostResponse;
 import com.noisetube.models.Stats;
 
@@ -259,24 +264,27 @@ public class MainActivity extends Activity {
 	 *
 	 */
 	public class PostSoundMeasurement extends AsyncTask<Void, Void, JsonResponse> {
-		private SoundMeasurement soundMeasurement;
-		private PointMeasurement pointMeasurement;
-		private LocationMeasurment locationMeasurment;
+		private PostRequest postRequest;
 		
 		public PostSoundMeasurement(SoundMeasurement soundMeasurement,PointMeasurement pointMeasurement,LocationMeasurment locationMeasurment) {
-			this.soundMeasurement = soundMeasurement;
-			this.locationMeasurment = locationMeasurment;
-			this.pointMeasurement = pointMeasurement;
+			Log.i("PostSoundMeasurement", "Post Created");
+			postRequest = new PostRequest(soundMeasurement, pointMeasurement, locationMeasurment);
+			
 		}
 
 		@Override
 		protected JsonResponse doInBackground(Void... arg) {
-			String url = "http://nuNogNiet";		
+			Log.i("PostSoundMeasurement", "Begin Posting Measurment");
+			
+			String url = "result/test/1";		
 			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();
-			Gson gson = new Gson();		
+			ObjectMapper objectMapper = new ObjectMapper();
+			
+			
 			try {
-				jsonResponse = serverConnection.post(url);
+				Log.d("PostSoundMeasurment", objectMapper.writeValueAsString(postRequest));
+				jsonResponse = serverConnection.post(url, objectMapper.writeValueAsString(postRequest));
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -288,30 +296,43 @@ public class MainActivity extends Activity {
 			if (jsonResponse.hasErrors()) {
 				System.out.println("Errors Put Points");
 
-				//TODO Use real points response
-				Points points = new Points();
-				points.setMultiplierLocation(2);
-				points.setMultiplierSpecial(1);
-				points.setMultiplierTime(1);
-				points.setPoints(222);
+				new AlertDialog.Builder(getFragmentManager().findFragmentById(R.id.container).getView().getContext())
+			    .setTitle("Network Connection Problem")
+			    .setMessage("Make sure a network connection is present when posting results. Measurements will be saved and added to your acount at a later time.")
+			    .setPositiveButton("Save", new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			            Log.i("Main Activity AlertDialog", "User clicked to save");
+			            //TODO save here
+			        }
+			     })
+			    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			        public void onClick(DialogInterface dialog, int which) { 
+			        	  Log.i("Main Activity AlertDialog", "User clicked to delete");
+			        }
+			     })
+			    .setIcon(android.R.drawable.ic_dialog_alert)
+			     .show();
 
-				Stats stats = new Stats();
-				stats.setAmount(11);
-				stats.setExp(501);
-				stats.setExpMax(1010);
-				stats.setLevel(4);
-				stats.setTime(600);
-
-				PostResponse postResponse = new PostResponse();
-				postResponse.setPoints(points);
-				postResponse.setStats(stats);
-
-				Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
-				intent.putExtra(PostResponse.PARAM_POSTRESPONSE, postResponse);
-
-				startActivity(intent);
 			} else {
 				System.out.println("Success Put Point");
+				ObjectMapper objectMapper = new ObjectMapper();
+				
+				Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
+				try {
+					Log.i("MainActivity Response" , "Server Response: " + jsonResponse.toString());
+					PostResponse postResponse = objectMapper.readValue(jsonResponse.getMessage(), PostResponse.class);
+					System.out.println(postResponse.getPoints().toString());
+					intent.putExtra(PostResponse.PARAM_POSTRESPONSE, objectMapper.readValue(jsonResponse.getMessage(), PostResponse.class)); 
+					startActivity(intent);
+				} catch (JsonParseException e) {
+					e.printStackTrace();
+				} catch (JsonMappingException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				
 
 			}
 		}			

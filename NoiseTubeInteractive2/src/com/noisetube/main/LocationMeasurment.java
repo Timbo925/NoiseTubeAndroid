@@ -44,10 +44,6 @@ public class LocationMeasurment implements Serializable, GooglePlayServicesClien
 
 	}
 
-	void start() {
-	
-	}
-
 	void measure () {
 		if (connected) {
 			Log.d("LocationMeasurment", "Measuring");

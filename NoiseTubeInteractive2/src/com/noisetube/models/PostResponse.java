@@ -1,7 +1,12 @@
 package com.noisetube.models;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Representation of the response from server when results are posted.
@@ -11,63 +16,45 @@ import java.util.List;
  */
 public class PostResponse implements Serializable{
 	
-	private Points points;
-	private Stats stats;
-	private List<Badge> badges;
-	
 	private static final long serialVersionUID = 2991148424155562339L;
 	public static final String PARAM_POSTRESPONSE = "PostResponse";
+	
+	@JsonProperty("stats")
+	private Stats stats;
+	@JsonProperty("points")
+	private Points points;
+	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	@Override
-	public String toString() {
-		return "PostResponse [points=" + points + ", stats=" + stats
-				+ ", badges=" + badges + "]";
-	}
-
-	/**
-	 * @return the points
-	 */
-	public Points getPoints() {
-		return points;
-	}
-
-	/**
-	 * @param points the points to set
-	 */
-	public void setPoints(Points points) {
-		this.points = points;
-	}
-
-	/**
-	 * @return the stats
-	 */
+	@JsonProperty("stats")
 	public Stats getStats() {
-		return stats;
+	return stats;
 	}
 
-	/**
-	 * @param stats the stats to set
-	 */
+	@JsonProperty("stats")
 	public void setStats(Stats stats) {
-		this.stats = stats;
+	this.stats = stats;
 	}
 
-	/**
-	 * @return the basges
-	 */
-	public List<Badge> getBadges() {
-		return badges;
+	@JsonProperty("points")
+	public Points getPoints() {
+	return points;
 	}
 
-	/**
-	 * @param basges the basges to set
-	 */
-	public void setBadges(List<Badge> badges) {
-		this.badges = badges;
+	@JsonProperty("points")
+	public void setPoints(Points points) {
+	this.points = points;
 	}
+
+	@JsonAnyGetter
+	public Map<String, Object> getAdditionalProperties() {
+	return this.additionalProperties;
+	}
+
+	@JsonAnySetter
+	public void setAdditionalProperty(String name, Object value) {
+	this.additionalProperties.put(name, value);
+	}
+
 
 	/**
 	 * @return the serialversionuid

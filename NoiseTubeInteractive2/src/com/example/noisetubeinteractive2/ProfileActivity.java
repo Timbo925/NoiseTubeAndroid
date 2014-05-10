@@ -27,7 +27,7 @@ import com.noisetube.models.Stats;
 
 public class ProfileActivity extends Activity {
 
-	private static String statsURL = "http://192.168.1.8:3002/user/5db7088d63a6737ee272f5f1dff8ac37ede5cbef27ea8380f8d691ce59de2d1a";
+	private static String statsURL = "http://192.168.1.8:3002/user/test";
 	TextView textProfileUserName;
 	TextView textProfileEmail;
 	TextView textExp;
@@ -64,10 +64,11 @@ public class ProfileActivity extends Activity {
 			Gson gson = new Gson();
 			Stats stats = gson.fromJson(statsString, Stats.class);
 
-			textExp.setText(stats.getExp() + "/" + stats.getExpMax());
-			textLvl.setText(Integer.toString(stats.getLevel()));
-			textAmount.setText(Integer.toString(stats.getAmount()));
-			textTime.setText(Integer.toString(stats.getTime()));
+		//	textExp.setText(stats.getExp() + "/" + stats.getExpMax());
+		//	textLvl.setText(Integer.toString(stats.getLevel()));
+		//	textAmount.setText(Integer.toString(stats.getAmount()));
+		//	textTime.setText(Integer.toString(stats.getTime()));
+			
 		}
 
 		//		if (savedInstanceState == null) {

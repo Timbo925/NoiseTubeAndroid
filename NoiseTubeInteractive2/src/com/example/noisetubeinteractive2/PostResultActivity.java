@@ -1,11 +1,10 @@
 package com.example.noisetubeinteractive2;
 
-import java.io.Console;
-
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.noisetube.models.Points;
@@ -84,6 +84,12 @@ public class PostResultActivity extends Activity {
 		private TextView textMultiTime;
 		private TextView textMultiBonus;
 		private TextView textPointsTotal;
+		private ProgressBar progressBar;
+		private TextView progressText;
+		private TextView levelText;
+		private int size;
+		boolean levelUp = false;
+		int level;
 		
 		public PointsFragment() {
 		}
@@ -97,26 +103,81 @@ public class PostResultActivity extends Activity {
 			SharedPreferences storage = getActivity().getSharedPreferences("prefs", 0); 					//Accessing local keyvalue store
 			SharedPreferences.Editor storageEditor = storage.edit();					//Make editing possible
 			Log.d("PostResultActivity", "StatsJson: " + postResponse.getStats().toJsonString());
+			Log.d("PostResultActivity", "PointsJson: " + postResponse.getPoints().toJsonString());
 			
 			storageEditor.putString(Stats.STATS, postResponse.getStats().toJsonString());	//Save Stats in Json format
 			storageEditor.apply();													     	//Commit all changes 
 
-			Log.d("PostResultActivity", "PostResponse" + postResponse);
+			Log.d("PostResultActivity", "PostResponse" + postResponse.toString());
 			
-			textPoints = (TextView) rootView.findViewById(R.id.post_points);
+
 			textMultiBonus = (TextView) rootView.findViewById(R.id.post_multi_bonus);
 			textMultiLoc = (TextView) rootView.findViewById(R.id.post_multi_loc);
 			textMultiTime = (TextView) rootView.findViewById(R.id.post_multi_time);
 			textPointsTotal = (TextView) rootView.findViewById(R.id.post_points_total);
+			progressBar = (ProgressBar) rootView.findViewById(R.id.post_progressbar);
+			progressText = (TextView) rootView.findViewById(R.id.post_progress_text);
+			levelText = (TextView) rootView.findViewById(R.id.post_lvl);
 			
-			textPoints.setText(Integer.toString(postResponse.getPoints().getPoints()));
-			textMultiBonus.setText(Double.toString(postResponse.getPoints().getMultiplierSpecial()));
-			textMultiLoc.setText(Double.toString(postResponse.getPoints().getMultiplierLocation()));
-			textMultiTime.setText(Double.toString(postResponse.getPoints().getMultiplierTime()));
-			textPointsTotal.setText(Float.toString(postResponse.getPoints().getPointsTotal()));
+			textMultiBonus.setText(Double.toString(postResponse.getPoints().getMulti_special()));
+			textMultiLoc.setText(Double.toString(postResponse.getPoints().getMulti_place()));
+			textMultiTime.setText(Double.toString(postResponse.getPoints().getMulti_time()));
+			textPointsTotal.setText(Float.toString(postResponse.getPoints().getPoints()));
+			
+			size = postResponse.getStats().getNextLevel() - postResponse.getStats().getLastLevel();
+			int levelProgress = postResponse.getStats().getExp() - postResponse.getStats().getLastLevel();
+			if (size < levelProgress) {
+				size = levelProgress; 
+				levelUp = true; 
+				level = postResponse.getStats().getLevel();
+				levelText.setText(Integer.toString(postResponse.getStats().getLevel() - 1));
+			} else {
+				levelText.setText(Integer.toString(postResponse.getStats().getLevel()));
+			}
+			progressBar.setMax(size);
+			progressBar.setProgress(0);
+			progressText.setText(Integer.toString(levelProgress) + "/" + Integer.toString(size));
+			
+			
+			ProgressBarAnimation animation = new ProgressBarAnimation();
+			animation.execute(size, levelProgress);
 			
 			//TODO save and show possible new badges
+			
 			return rootView;
 		}	
+		public class ProgressBarAnimation extends AsyncTask<Integer, Integer, Void> {
+			int counter = 0;
+		    @Override
+		    protected Void doInBackground(Integer... params) {
+		        while (progressBar.getProgress() < params[1]) {
+		            publishProgress(counter);
+		            counter++;
+		            try {
+		                Thread.sleep(10);
+		            } catch (InterruptedException e) {
+		                e.printStackTrace();
+		            }
+		        }
+		        return null;
+		    }
+
+		    @Override
+		    protected void onProgressUpdate(Integer... values) {
+		        progressBar.incrementProgressBy(1);
+		        progressText.setText(Integer.toString(values[0]) + "/" + Integer.toString(size));        
+		    }
+
+			@Override
+			protected void onPostExecute(Void result) {
+				super.onPostExecute(result);
+				
+				if (levelUp) {
+					levelText.setText(Integer.toString(level));
+				}
+			}
+		    
+		    
+		}
 	}
 }
