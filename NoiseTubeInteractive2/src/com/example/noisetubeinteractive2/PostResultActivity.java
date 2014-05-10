@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.noisetube.models.Points;
 import com.noisetube.models.PostResponse;
 import com.noisetube.models.Stats;
+import com.vub.storage.StatsStorage;
 
 public class PostResultActivity extends Activity {
 	
@@ -29,7 +30,6 @@ public class PostResultActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_post_result);
 		
-		//points = (Points) this.getIntent().getExtras().getSerializable(Points.POINTS);
 
 		if (savedInstanceState == null) {
 			getFragmentManager().beginTransaction()
@@ -78,11 +78,7 @@ public class PostResultActivity extends Activity {
 	}
 	
 	public void startShare(View v) {
-		//Fragment frag =  this.getFragmentManager().findFragmentById(R.id.post_fragment);
-		//System.out.println("Opended frag");
-		//PointsFragment pointsFragment = (PointsFragment) frag;
-		//System.out.println("Casted");
-		//System.out.println(pointsFragment.getPostResponse());
+
 		PostResponse postResponse = (PostResponse) this.getIntent().getExtras().getSerializable(PostResponse.PARAM_POSTRESPONSE);
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
@@ -94,7 +90,6 @@ public class PostResultActivity extends Activity {
 	public static class PointsFragment extends Fragment {
 		
 		private PostResponse postResponse;
-		private TextView textPoints;
 		private TextView textMultiLoc;
 		private TextView textMultiTime;
 		private TextView textMultiBonus;
@@ -118,7 +113,8 @@ public class PostResultActivity extends Activity {
 			View rootView = inflater.inflate(R.layout.fragment_post_result,container, false);
 			
 			postResponse = (PostResponse) getActivity().getIntent().getExtras().getSerializable(PostResponse.PARAM_POSTRESPONSE);
-
+			StatsStorage statsStorage = new StatsStorage(getActivity());
+			statsStorage.setStats(postResponse.getStats());
 			SharedPreferences storage = getActivity().getSharedPreferences("prefs", 0); 					//Accessing local keyvalue store
 			SharedPreferences.Editor storageEditor = storage.edit();					//Make editing possible
 			Log.d("PostResultActivity", "StatsJson: " + postResponse.getStats().toJsonString());

@@ -19,15 +19,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.noisetube.main.JsonResponse;
+import com.noisetube.main.Profile;
 import com.noisetube.main.ServerConnection;
 import com.noisetube.models.Stats;
+import com.vub.storage.ProfileStorage;
+import com.vub.storage.StatsStorage;
 
 public class ProfileActivity extends Activity {
 
-	private static String statsURL = "http://192.168.1.8:3002/user/test";
 	TextView textProfileUserName;
 	TextView textProfileEmail;
 	TextView textExp;
@@ -46,38 +51,30 @@ public class ProfileActivity extends Activity {
 		textLvl = (TextView) findViewById(R.id.profile_lvl);
 		textAmount = (TextView) findViewById(R.id.profile_msr);
 		textTime = (TextView) findViewById(R.id.profile_time);
-	
+
 		SharedPreferences storage = getSharedPreferences("prefs", 0);
-		String statsString = storage.getString(Stats.STATS, null);
-		boolean found = storage.contains(Stats.STATS);
-		System.out.println(found); //Returns False --> Not found
-		
-		Log.d("ProfileActivity", "StatsString: " +statsString);
-		
-		if (statsString == null) {
-			//Getting profile information from server
-			new GetProfile().execute(statsURL);
+
+		if (!storage.contains(StatsStorage.PARAM_SAVE) || !storage.contains(ProfileStorage.PARAM_SAVE)) {
+			new GetProfile().execute("user/test");
 		} else {
-			//Profile info exists in the keyvalue store
+			ProfileStorage profileStorage = new ProfileStorage(getApplicationContext());
+			StatsStorage statsStorage = new StatsStorage(getApplicationContext());
+			Profile profile = profileStorage.getProfile();
+			Stats stats = statsStorage.getStats();
 			
-			//TODO set username from SharedPreferences
-			Gson gson = new Gson();
-			Stats stats = gson.fromJson(statsString, Stats.class);
+			Log.d("ProfileActivity", "Profile: " + profile);
+			Log.d("ProfileActivity", "Stats: " + stats);
+			
+			textProfileUserName.setText(profile.getUserName());
+			textProfileEmail.setText(profile.getEmail());
+			textExp.setText(Integer.toString(stats.getExp() - stats.getLastLevel())+ "/" + Integer.toString((stats.getNextLevel() - stats.getLastLevel())));
+			textLvl.setText(Integer.toString(stats.getLevel()));
+			textAmount.setText(Integer.toString(stats.getAmountMeasurments()));
+			textTime.setText(stats.getTotalTime());
 
-		//	textExp.setText(stats.getExp() + "/" + stats.getExpMax());
-		//	textLvl.setText(Integer.toString(stats.getLevel()));
-		//	textAmount.setText(Integer.toString(stats.getAmount()));
-		//	textTime.setText(Integer.toString(stats.getTime()));
-			
 		}
-
-		//		if (savedInstanceState == null) {
-		//			getFragmentManager().beginTransaction()
-		//				.add(R.id.container, new PlaceholderFragment()).commit();
-		//		}
 	}
 
-	//TODO Also retrieve STATS to include into profile
 	private class GetProfile extends AsyncTask<String, Void, JsonResponse> {
 
 		@Override
@@ -98,12 +95,23 @@ public class ProfileActivity extends Activity {
 
 		@Override
 		protected void onPostExecute(JsonResponse jsonResponse) { // Function has access to the UI treat
-			JsonObject jsonObject = new JsonObject();
+
 			if (jsonResponse.hasErrors()) {
 				textProfileUserName.setText("Bob");
 				textProfileEmail.setText("Bob@gmail.com");
 			} else {
-
+				ObjectMapper objectMapper = new ObjectMapper();
+				try {
+					Profile profile = objectMapper.readValue(jsonResponse.getMessage(), Profile.class);
+					ProfileStorage profileStorage = new ProfileStorage(getApplicationContext());
+					profileStorage.setProfile(profile);
+				} catch (JsonParseException e) {
+					e.printStackTrace();
+				} catch (JsonMappingException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}	
 	}
