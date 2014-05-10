@@ -5,13 +5,14 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="14"
+        android:minSdkVersion="16"
         android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:name="com.noisetube.main.ServerConnection"
@@ -82,6 +83,12 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.noisetubeinteractive2.MainActivity" />
         </activity>
+        
+        <service 
+            android:name="com.noisetube.main.MyAlarmService"
+            android:label="Next Screen"></service>
+        
+        <receiver android:name="com.noisetube.main.NotificationReceiver"></receiver>
 
         <meta-data
             android:name="com.google.android.gms.version"

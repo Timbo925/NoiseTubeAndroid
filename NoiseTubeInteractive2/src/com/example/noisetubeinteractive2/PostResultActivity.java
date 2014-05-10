@@ -22,6 +22,7 @@ import com.noisetube.models.Stats;
 public class PostResultActivity extends Activity {
 	
 	Points points;
+	int pointsInt;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +77,20 @@ public class PostResultActivity extends Activity {
 		startActivity(intent);
 	}
 	
+	public void startShare(View v) {
+		//Fragment frag =  this.getFragmentManager().findFragmentById(R.id.post_fragment);
+		//System.out.println("Opended frag");
+		//PointsFragment pointsFragment = (PointsFragment) frag;
+		//System.out.println("Casted");
+		//System.out.println(pointsFragment.getPostResponse());
+		PostResponse postResponse = (PostResponse) this.getIntent().getExtras().getSerializable(PostResponse.PARAM_POSTRESPONSE);
+		Intent sendIntent = new Intent();
+		sendIntent.setAction(Intent.ACTION_SEND);
+		sendIntent.putExtra(Intent.EXTRA_TEXT, "I just scored " + Integer.toString(postResponse.getPoints().getPoints()) + " points in NoiseTube! www.noisetube.be");
+		sendIntent.setType("text/plain");
+		startActivity(sendIntent);
+	}
+	
 	public static class PointsFragment extends Fragment {
 		
 		private PostResponse postResponse;
@@ -92,6 +107,10 @@ public class PostResultActivity extends Activity {
 		int level;
 		
 		public PointsFragment() {
+		}
+		
+		public PostResponse getPostResponse() {
+			return postResponse;
 		}
 
 		@Override
@@ -110,7 +129,7 @@ public class PostResultActivity extends Activity {
 
 			Log.d("PostResultActivity", "PostResponse" + postResponse.toString());
 			
-
+			
 			textMultiBonus = (TextView) rootView.findViewById(R.id.post_multi_bonus);
 			textMultiLoc = (TextView) rootView.findViewById(R.id.post_multi_loc);
 			textMultiTime = (TextView) rootView.findViewById(R.id.post_multi_time);

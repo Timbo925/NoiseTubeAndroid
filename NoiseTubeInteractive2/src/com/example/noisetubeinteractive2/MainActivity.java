@@ -1,16 +1,20 @@
 package com.example.noisetubeinteractive2;
 
 import java.io.IOException;
+import java.util.Calendar;
 
 import android.app.Activity;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -28,26 +32,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.noisetube.main.JsonResponse;
 import com.noisetube.main.LocationMeasurment;
+import com.noisetube.main.NotificationReceiver;
 import com.noisetube.main.PointMeasurement;
 import com.noisetube.main.ServerConnection;
 import com.noisetube.main.SoundMeasurement;
 import com.noisetube.main.SoundMeasurementService;
-import com.noisetube.models.Points;
 import com.noisetube.models.PostRequest;
 import com.noisetube.models.PostResponse;
-import com.noisetube.models.Stats;
 
 public class MainActivity extends Activity {
 
 	public final static String EXTRA_MESSAGE = "com.example.noisetubeinteractive2.EXTRA_MESSAGE";
 	private DbResponse dbResponse;
 	private FinalDbResponse finalDbResponse;
+	private SharedPreferences storage;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -65,9 +68,29 @@ public class MainActivity extends Activity {
 		finalDbResponse = new FinalDbResponse();
 		registerReceiver(finalDbResponse, filter2);
 
+		//Creating notification in 20 hours
+		storage = this.getSharedPreferences("prefs", 0);
+		Long lastNotification = storage.getLong("Last Notification", 0);
+		Log.d("MainActivity", "Last Notification: " + lastNotification);
+		if(lastNotification == 0 || (System.currentTimeMillis() - lastNotification) > (20 *60 * 60 * 1000)) {
+			SharedPreferences.Editor editor = storage.edit();
+			editor.putLong("Last Notification", System.currentTimeMillis());
+			editor.apply();
+			Calendar calendar = Calendar.getInstance();
+			calendar.setTimeInMillis(System.currentTimeMillis() + (20 *60 * 60 * 1000)); //
+			
+			Intent myIntent = new Intent(MainActivity.this, NotificationReceiver.class);
+			PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent,0);
+
+			AlarmManager alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
+			alarmManager.set(AlarmManager.RTC, calendar.getTimeInMillis(), pendingIntent);
+			Log.d("MainActivity", "Register Alarm");
+		}
+		
+		
+
 		//Hiding Stop button
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
-		//buttonStop.setVisibility(View.GONE);
 
 		//Adding fragmets to the mainActivity
 		if (savedInstanceState == null) {
@@ -149,11 +172,11 @@ public class MainActivity extends Activity {
 				TextView textMulti  = (TextView) frag.getView().findViewById(R.id.home_multi_loc);
 				TextView textMultiBonus = (TextView) frag.getView().findViewById(R.id.home_multi_bonus);
 				TextView textLocation = (TextView) frag.getView().findViewById(R.id.home_location);
-				
+
 				SoundMeasurement soundMeasurement = (SoundMeasurement) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_SOUNDM);
 				PointMeasurement pointMeasurement = (PointMeasurement) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_POINTM);
 				LocationMeasurment locationMeasurment = (LocationMeasurment) intent.getSerializableExtra(SoundMeasurementService.PARAM_OUT_LOCATIONM);
-				
+
 				System.out.println(pointMeasurement);
 				textDbMax.setText(Integer.toString(soundMeasurement.getDbMax()) + dbText);
 				textDbMin.setText(Integer.toString(soundMeasurement.getDbMin()) + dbText);
@@ -191,7 +214,7 @@ public class MainActivity extends Activity {
 			Log.i("FinalDbResponse: ", gson.toJson(soundMeasurement).toString());
 			Log.i("FinalDbResponse: ", gson.toJson(locationMeasurment).toString());
 			Log.i("FinalDbResponse: ", gson.toJson(pointMeasurement).toString());
-			
+
 
 			PostSoundMeasurement postSoundMeasurement = new PostSoundMeasurement(soundMeasurement, pointMeasurement, locationMeasurment);
 			postSoundMeasurement.execute();
@@ -202,7 +225,7 @@ public class MainActivity extends Activity {
 
 	public void startMeasuring(View view) {
 		//Intent mServiceIntent;
-		
+
 		LocationManager service = (LocationManager) getSystemService(LOCATION_SERVICE);
 		boolean enabled = service .isProviderEnabled(LocationManager.GPS_PROVIDER);
 
@@ -210,10 +233,10 @@ public class MainActivity extends Activity {
 		// Better solution would be to display a dialog and suggesting to 
 		// go to the settings
 		if (!enabled) {
-		  Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-		  startActivity(intent);
+			Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+			startActivity(intent);
 		} 
-		
+
 		Chronometer chronometer = (Chronometer) findViewById(R.id.home_chrono);
 		Button buttonStop = (Button) findViewById(R.id.home_btn_stop);
 		Button buttonStart = (Button) findViewById(R.id.home_btn_start);
@@ -252,7 +275,7 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, ProfileActivity.class);
 		startActivity(intent);
 	}
-	
+
 	public void startPoi() {
 		Intent intent = new Intent(this, PoiActivity.class);
 		startActivity(intent);
@@ -265,23 +288,23 @@ public class MainActivity extends Activity {
 	 */
 	public class PostSoundMeasurement extends AsyncTask<Void, Void, JsonResponse> {
 		private PostRequest postRequest;
-		
+
 		public PostSoundMeasurement(SoundMeasurement soundMeasurement,PointMeasurement pointMeasurement,LocationMeasurment locationMeasurment) {
 			Log.i("PostSoundMeasurement", "Post Created");
 			postRequest = new PostRequest(soundMeasurement, pointMeasurement, locationMeasurment);
-			
+
 		}
 
 		@Override
 		protected JsonResponse doInBackground(Void... arg) {
 			Log.i("PostSoundMeasurement", "Begin Posting Measurment");
-			
+
 			String url = "result/test/1";		
 			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();
 			ObjectMapper objectMapper = new ObjectMapper();
-			
-			
+
+
 			try {
 				Log.d("PostSoundMeasurment", objectMapper.writeValueAsString(postRequest));
 				jsonResponse = serverConnection.post(url, objectMapper.writeValueAsString(postRequest));
@@ -297,26 +320,26 @@ public class MainActivity extends Activity {
 				System.out.println("Errors Put Points");
 
 				new AlertDialog.Builder(getFragmentManager().findFragmentById(R.id.container).getView().getContext())
-			    .setTitle("Network Connection Problem")
-			    .setMessage("Make sure a network connection is present when posting results. Measurements will be saved and added to your acount at a later time.")
-			    .setPositiveButton("Save", new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int which) { 
-			            Log.i("Main Activity AlertDialog", "User clicked to save");
-			            //TODO save here
-			        }
-			     })
-			    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			        public void onClick(DialogInterface dialog, int which) { 
-			        	  Log.i("Main Activity AlertDialog", "User clicked to delete");
-			        }
-			     })
-			    .setIcon(android.R.drawable.ic_dialog_alert)
-			     .show();
+				.setTitle("Network Connection Problem")
+				.setMessage("Make sure a network connection is present when posting results. Measurements will be saved and added to your acount at a later time.")
+				.setPositiveButton("Save", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) { 
+						Log.i("Main Activity AlertDialog", "User clicked to save");
+						//TODO save here
+					}
+				})
+				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) { 
+						Log.i("Main Activity AlertDialog", "User clicked to delete");
+					}
+				})
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.show();
 
 			} else {
 				System.out.println("Success Put Point");
 				ObjectMapper objectMapper = new ObjectMapper();
-				
+
 				Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
 				try {
 					Log.i("MainActivity Response" , "Server Response: " + jsonResponse.toString());
@@ -332,10 +355,9 @@ public class MainActivity extends Activity {
 					e.printStackTrace();
 				}
 
-				
+
 
 			}
 		}			
-	}
-
+	}	
 }
