@@ -30,7 +30,7 @@ import com.google.gson.Gson;
  * Access trough: ServerConnection serverConnection = (ServerConnection) getApplication();
  */
 public class ServerConnection extends Application {
-	public static final String base_url = "http://192.168.1.8:3002/";
+	public static final String base_url = "http://192.168.0.103:3002/";
 	
 	HttpClient client = new DefaultHttpClient();
 	HttpResponse response;

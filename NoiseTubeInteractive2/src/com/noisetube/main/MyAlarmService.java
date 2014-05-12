@@ -12,9 +12,9 @@ import android.support.v4.app.NotificationCompat;
 import com.example.noisetubeinteractive2.MainActivity;
 import com.example.noisetubeinteractive2.R;
 
-public class MyAlarmService extends Service 
-{
+public class MyAlarmService extends Service {
 
+	public final static String notificationBonus = "Notification Bonus";
 	private NotificationManager mManager;
 
 	@Override
@@ -35,11 +35,11 @@ public class MyAlarmService extends Service
 
 		NotificationCompat.Builder mBuilder =
 				new NotificationCompat.Builder(this)
-		.setSmallIcon(R.drawable.ic_launcher)
+		.setSmallIcon(R.drawable.ic_launcher_bakcup)
 		.setContentTitle("NoiseTube Bonus")
 		.setContentText("Come back today and earn extra 100 points!");
 		Intent resultIntent = new Intent(this, MainActivity.class);
-
+		resultIntent.putExtra(notificationBonus, 100); //TOOD variable points for notification
 
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 

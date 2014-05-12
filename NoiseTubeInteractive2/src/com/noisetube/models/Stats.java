@@ -23,6 +23,7 @@ public class Stats implements Serializable{
 	private Integer nextLevel;
 	@JsonProperty("lastLevel")
 	private Integer lastLevel;
+	
 
 	private static final long serialVersionUID = 1705459163208937073L;
 	public static final String STATS = "STATS";

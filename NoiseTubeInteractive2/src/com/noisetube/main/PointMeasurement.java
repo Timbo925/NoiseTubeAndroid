@@ -78,6 +78,10 @@ public class PointMeasurement implements Serializable {
 			locationMultiplier = Math.round(multi * 100.0) / 100.0;
 			
 		} catch (NullPointerException e) {
+			pointsReal += 1;
+			points = (int) pointsReal; //We round the points number for better looks
+			locationMultiplier = 1.00;
+			
 			System.out.println("Update()");
 			poiStorage.update();
 			e.printStackTrace();

@@ -107,7 +107,10 @@ public class PoiActivity extends Activity {
 			} catch (NullPointerException e) {
 				Log.i("PoiActivity onCreateView", "No pois found in database, update poiStorage");
 				GetPoi loadPois = new GetPoi();
-				loadPois.execute("poi/"+ location.getLatitude() +"/"+ location.getLongitude()+"/10" , "");		
+				if (location != null) {
+					loadPois.execute("poi/"+ location.getLatitude() +"/"+ location.getLongitude()+"/10" , "");		
+				}
+				
 			}
 
 			listView.setAdapter(adapter);

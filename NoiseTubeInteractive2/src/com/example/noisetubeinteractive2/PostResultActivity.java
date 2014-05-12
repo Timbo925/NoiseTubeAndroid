@@ -1,7 +1,11 @@
 package com.example.noisetubeinteractive2;
 
+import java.io.IOException;
+
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Fragment;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -15,6 +19,9 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.noisetube.main.JsonResponse;
+import com.noisetube.main.ServerConnection;
 import com.noisetube.models.Points;
 import com.noisetube.models.PostResponse;
 import com.noisetube.models.Stats;
@@ -82,9 +89,44 @@ public class PostResultActivity extends Activity {
 		PostResponse postResponse = (PostResponse) this.getIntent().getExtras().getSerializable(PostResponse.PARAM_POSTRESPONSE);
 		Intent sendIntent = new Intent();
 		sendIntent.setAction(Intent.ACTION_SEND);
-		sendIntent.putExtra(Intent.EXTRA_TEXT, "I just scored " + Integer.toString(postResponse.getPoints().getPoints()) + " points in NoiseTube! www.noisetube.be");
+		sendIntent.putExtra(Intent.EXTRA_TEXT, "I just scored " + Integer.toString(postResponse.getPoints().getPoints()) + " points in NoiseTube. Try to beat that! https://play.google.com/store/apps/details?id=net.noisetube&hl=nl");
 		sendIntent.setType("text/plain");
+		
+		AddBonus addBonus = new AddBonus();
+		addBonus.execute(50);
+		
 		startActivity(sendIntent);
+		
+		
+	}
+	
+	public class AddBonus extends AsyncTask<Integer, Void, JsonResponse> {
+		int bonus = 0;
+		
+		@Override
+		protected JsonResponse doInBackground(Integer... arg) {
+			Log.i("PostSoundMeasurement", "Begin Posting Measurment");
+
+			String url = "result/test/add/";	
+			url += arg[0];
+			bonus = arg[0];
+			ServerConnection serverConnection = (ServerConnection) getApplication();
+			JsonResponse jsonResponse = new JsonResponse();
+			ObjectMapper objectMapper = new ObjectMapper();
+
+
+			try {
+				jsonResponse = serverConnection.post(url);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return jsonResponse;		
+		}
+
+		@Override
+		protected void onPostExecute(JsonResponse jsonResponse) { //Access to the GUI tread
+
+		}			
 	}
 	
 	public static class PointsFragment extends Fragment {

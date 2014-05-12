@@ -1,7 +1,9 @@
 package com.example.noisetubeinteractive2;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -37,6 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.noisetube.main.JsonResponse;
 import com.noisetube.main.LocationMeasurment;
+import com.noisetube.main.MyAlarmService;
 import com.noisetube.main.NotificationReceiver;
 import com.noisetube.main.PointMeasurement;
 import com.noisetube.main.ServerConnection;
@@ -44,6 +47,7 @@ import com.noisetube.main.SoundMeasurement;
 import com.noisetube.main.SoundMeasurementService;
 import com.noisetube.models.PostRequest;
 import com.noisetube.models.PostResponse;
+import com.vub.storage.PostRequestStorage;
 
 public class MainActivity extends Activity {
 
@@ -51,6 +55,7 @@ public class MainActivity extends Activity {
 	private DbResponse dbResponse;
 	private FinalDbResponse finalDbResponse;
 	private SharedPreferences storage;
+	private Intent mServiceIntent;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,12 +77,12 @@ public class MainActivity extends Activity {
 		storage = this.getSharedPreferences("prefs", 0);
 		Long lastNotification = storage.getLong("Last Notification", 0);
 		Log.d("MainActivity", "Last Notification: " + lastNotification);
-		if(lastNotification == 0 || (System.currentTimeMillis() - lastNotification) > (20 *60 * 60 * 1000)) {
+		if(lastNotification == 0 || (System.currentTimeMillis() - lastNotification) > (10000)) { //TODO set slow notification 20 *60 * 60 * 1000
 			SharedPreferences.Editor editor = storage.edit();
 			editor.putLong("Last Notification", System.currentTimeMillis());
 			editor.apply();
 			Calendar calendar = Calendar.getInstance();
-			calendar.setTimeInMillis(System.currentTimeMillis() + (20 *60 * 60 * 1000)); //
+			calendar.setTimeInMillis(System.currentTimeMillis() + (10000)); //
 			
 			Intent myIntent = new Intent(MainActivity.this, NotificationReceiver.class);
 			PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, myIntent,0);
@@ -87,6 +92,11 @@ public class MainActivity extends Activity {
 			Log.d("MainActivity", "Register Alarm");
 		}
 		
+		//BONUS GIVEN FOR RETURNING FOR NOTIFICATON
+		if (this.getIntent().hasExtra(MyAlarmService.notificationBonus)) {
+			AddBonus addBonus = new AddBonus();
+			addBonus.execute(this.getIntent().getIntExtra(MyAlarmService.notificationBonus, 0));
+		}
 		
 
 		//Hiding Stop button
@@ -221,8 +231,6 @@ public class MainActivity extends Activity {
 		}
 	}	
 
-	private Intent mServiceIntent;
-
 	public void startMeasuring(View view) {
 		//Intent mServiceIntent;
 
@@ -269,7 +277,6 @@ public class MainActivity extends Activity {
 		mServiceIntent.putExtra(SoundMeasurementService.PARAM_COMMAND,SoundMeasurementService.PARAM_STOP_COMMAND);
 		startService(mServiceIntent);			
 	}
-
 
 	public void startProfile() {
 		Intent intent = new Intent(this, ProfileActivity.class);
@@ -324,8 +331,31 @@ public class MainActivity extends Activity {
 				.setMessage("Make sure a network connection is present when posting results. Measurements will be saved and added to your acount at a later time.")
 				.setPositiveButton("Save", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) { 
+
 						Log.i("Main Activity AlertDialog", "User clicked to save");
-						//TODO save here
+						
+						PostRequestStorage postRequestStorage = new PostRequestStorage(getApplicationContext());
+						List<PostRequest> list = new ArrayList<PostRequest>();
+						
+						if (postRequestStorage.getPostRequestList() != null) {
+							list = postRequestStorage.getPostRequestList();
+						}
+						
+						list.add(postRequest);
+						postRequestStorage.setPostRequestList(list);
+						
+						//TODO SIMULATE SUCCESS
+						ObjectMapper objectMapper = new ObjectMapper();
+						try {
+							Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
+							PostResponse postResponse = objectMapper.readValue("{ \"stats\": {\"idStats\": 114,\"exp\": 4692,\"level\": 13,\"amountMeasurments\": 53,\"totalTime\": \"00:00:00\",\"nextLevel\": 5432,\"lastLevel\": 4492,\"maxExp\": 54},\"points\": {\"points\": 51,\"multi_place\": 1.6,\"multi_time\": 1,\"multi_special\": 1}}", PostResponse.class);
+							intent.putExtra(PostResponse.PARAM_POSTRESPONSE, postResponse); 
+							startActivity(intent);
+							
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+						
 					}
 				})
 				.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -358,6 +388,45 @@ public class MainActivity extends Activity {
 
 
 			}
+		}			
+	}	
+	
+	public class AddBonus extends AsyncTask<Integer, Void, JsonResponse> {
+		int bonus = 0;
+		
+		@Override
+		protected JsonResponse doInBackground(Integer... arg) {
+			Log.i("PostSoundMeasurement", "Begin Posting Measurment");
+
+			String url = "result/test/add/";	
+			url += arg[0];
+			bonus = arg[0];
+			ServerConnection serverConnection = (ServerConnection) getApplication();
+			JsonResponse jsonResponse = new JsonResponse();
+			ObjectMapper objectMapper = new ObjectMapper();
+
+
+			try {
+				jsonResponse = serverConnection.post(url);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			return jsonResponse;		
+		}
+
+		@Override
+		protected void onPostExecute(JsonResponse jsonResponse) { //Access to the GUI tread
+
+				new AlertDialog.Builder(getFragmentManager().findFragmentById(R.id.container).getView().getContext())
+				.setMessage("Enjoy your daily " + bonus + " bonus points")
+				.setPositiveButton("Thanks!", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int which) { 
+						
+					}
+				})
+				.setIcon(android.R.drawable.ic_dialog_alert)
+				.show();
+
 		}			
 	}	
 }
