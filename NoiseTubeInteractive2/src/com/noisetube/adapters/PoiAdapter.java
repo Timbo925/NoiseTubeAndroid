@@ -4,12 +4,14 @@ import java.util.Collections;
 import java.util.List;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import com.example.noisetubeinteractive2.PoiMapsActivity;
 import com.example.noisetubeinteractive2.R;
 import com.noisetube.models.Poi;
 import com.noisetube.models.LeaderboardType;
@@ -28,6 +30,11 @@ public class PoiAdapter extends ArrayAdapter<Poi> {
 	
 	public List<Poi> getPois() {
 		return pois;
+	}
+	
+	public void startMap() {
+		Intent intent = new Intent(getContext(), PoiMapsActivity.class);
+		getContext().startActivity(intent);
 	}
 
 	public void setPois(List<Poi> poisIn) {

@@ -9,6 +9,7 @@ import org.apache.http.client.ClientProtocolException;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.content.Intent;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
@@ -33,6 +34,11 @@ import com.vub.storage.PoiStorage;
 
 public class PoiActivity extends Activity {
 
+	public void startMap(View v) {
+		Intent intent = new Intent(this, PoiMapsActivity.class);
+		startActivity(intent);
+	}
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -51,6 +57,8 @@ public class PoiActivity extends Activity {
 		getMenuInflater().inflate(R.menu.poi, menu);
 		return true;
 	}
+	
+	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -78,6 +86,11 @@ public class PoiActivity extends Activity {
 		private Location locationBase;
 
 		public PoiFragment() {
+		}
+		
+		public void startMap() {
+			Intent intent = new Intent(getActivity(), PoiMapsActivity.class);
+			startActivity(intent);
 		}
 
 		@Override
@@ -126,9 +139,11 @@ public class PoiActivity extends Activity {
 			if (location.distanceTo(locationBase) > 2) {
 				locationBase = location;
 				GetPoi loadPois = new GetPoi();
-				loadPois.execute("poi/"+ location.getLatitude() +"/"+ location.getLongitude()+"/10" , "");		
+				loadPois.execute("poi/"+ location.getLatitude() +"/"+ location.getLongitude()+"/100" , "");		
 			}		
 		}
+		
+		
 
 		@Override
 		public void onProviderDisabled(String provider) {

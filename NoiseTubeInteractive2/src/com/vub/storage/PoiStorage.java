@@ -111,6 +111,9 @@ public class PoiStorage {
 				try {
 					//Log.d("GetPoi", jsonResponse.getMessage());
 					List<Poi> pois2 = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<Poi>>(){});
+					for (Poi p : pois2) {
+						Log.d("PoiStorage", p.getPosition().toString());
+					}
 					System.out.println("POI Entrys from server: " + pois2);
 					//pois = pois2;
 					setPoiList(pois2);

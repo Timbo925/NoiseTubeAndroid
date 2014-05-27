@@ -13,6 +13,9 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
 
     <application
         android:name="com.noisetube.main.ServerConnection"
@@ -83,16 +86,37 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.noisetubeinteractive2.MainActivity" />
         </activity>
-        
-        <service 
+
+        <service
             android:name="com.noisetube.main.MyAlarmService"
-            android:label="Next Screen"></service>
-        
-        <receiver android:name="com.noisetube.main.NotificationReceiver"></receiver>
+            android:label="Next Screen" >
+        </service>
+
+        <receiver android:name="com.noisetube.main.NotificationReceiver" >
+        </receiver>
 
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDGT9QwZNwfm62BO6THJUETpAjd9uku4oY" />
+
+        <activity
+            android:name="com.example.noisetubeinteractive2.PoiMapActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:label="@string/title_activity_poi_map"
+            android:theme="@style/FullscreenTheme" >
+        </activity>
+        <activity
+            android:name="com.example.noisetubeinteractive2.PoiMapsActivity"
+            android:label="@string/title_activity_poi_maps" >
+        </activity>
+        <activity
+            android:name="com.example.noisetubeinteractive2.LoginActivity"
+            android:label="@string/title_activity_login"
+            android:windowSoftInputMode="adjustResize|stateVisible" >
+        </activity>
     </application>
 
 </manifest>

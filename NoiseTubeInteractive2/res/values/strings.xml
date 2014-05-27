@@ -41,8 +41,12 @@
     <string name="post_multi_bonus">Bonus Multiplier</string>
     <string name="post_points_total">Total Points</string>
     <string name="post_lvl">Level</string>
-    <string name="title_activity_leaderboard">Leaderboard</string>
-    <string name="title_activity_badges">BadgesActivity</string>
+    <string name="title_activity_leaderboard">Leaderboards</string>
+    <string name="title_activity_badges">Badges</string>
     <string name="title_activity_poi">Point Of Intrests</string>
+    <string name="title_activity_poi_map">Point of Interest Map</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_poi_maps">Point of Interest Map</string>
 
 </resources>

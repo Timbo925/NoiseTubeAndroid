@@ -48,6 +48,7 @@ import com.noisetube.main.SoundMeasurementService;
 import com.noisetube.models.PostRequest;
 import com.noisetube.models.PostResponse;
 import com.vub.storage.PostRequestStorage;
+import com.vub.storage.SessionStorage;
 
 public class MainActivity extends Activity {
 
@@ -133,9 +134,11 @@ public class MainActivity extends Activity {
 			System.out.println("action_profile clicked");
 			return true;
 		case R.id.action_settings:
-
+			startMapTest();
 			System.out.println("action_settngs clicked");
 			return true;
+		case R.id.action_login:
+			startLogin();
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -287,6 +290,16 @@ public class MainActivity extends Activity {
 		Intent intent = new Intent(this, PoiActivity.class);
 		startActivity(intent);
 	}
+	
+	public void startMapTest() {
+		Intent intent = new Intent(this, PoiMapsActivity.class);
+		startActivity(intent);
+	}
+	
+	public void startLogin() {
+		Intent intent = new Intent(this, LoginActivity.class);
+		startActivity(intent);
+	}
 
 	/**
 	 * Post measurements to database and pass PostResponse to the next Activity to display progress
@@ -310,13 +323,18 @@ public class MainActivity extends Activity {
 			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();
 			ObjectMapper objectMapper = new ObjectMapper();
-
-
-			try {
-				Log.d("PostSoundMeasurment", objectMapper.writeValueAsString(postRequest));
-				jsonResponse = serverConnection.post(url, objectMapper.writeValueAsString(postRequest));
-			} catch (IOException e) {
-				e.printStackTrace();
+			SessionStorage sessionStorage = new SessionStorage(getApplicationContext());
+			String sessionId = sessionStorage.getSession();
+			
+			if (sessionId != null) {
+				try {
+					Log.d("PostSoundMeasurment", objectMapper.writeValueAsString(postRequest));
+					jsonResponse = serverConnection.post(url, objectMapper.writeValueAsString(postRequest));
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			} else {
+				jsonResponse.setStatus(JsonResponse.ERROR);
 			}
 			return jsonResponse;		
 		}
@@ -344,17 +362,21 @@ public class MainActivity extends Activity {
 						list.add(postRequest);
 						postRequestStorage.setPostRequestList(list);
 						
+						//TODO save and create
+						Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+						startActivity(intent);
+						
 						//TODO SIMULATE SUCCESS
-						ObjectMapper objectMapper = new ObjectMapper();
-						try {
-							Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
-							PostResponse postResponse = objectMapper.readValue("{ \"stats\": {\"idStats\": 114,\"exp\": 4692,\"level\": 13,\"amountMeasurments\": 53,\"totalTime\": \"00:00:00\",\"nextLevel\": 5432,\"lastLevel\": 4492,\"maxExp\": 54},\"points\": {\"points\": 51,\"multi_place\": 1.6,\"multi_time\": 1,\"multi_special\": 1}}", PostResponse.class);
-							intent.putExtra(PostResponse.PARAM_POSTRESPONSE, postResponse); 
-							startActivity(intent);
-							
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
+//						ObjectMapper objectMapper = new ObjectMapper();
+//						try {
+//							Intent intent = new Intent(getApplicationContext(), PostResultActivity.class);
+//							PostResponse postResponse = objectMapper.readValue("{ \"stats\": {\"idStats\": 114,\"exp\": 4692,\"level\": 13,\"amountMeasurments\": 53,\"totalTime\": \"00:00:00\",\"nextLevel\": 5432,\"lastLevel\": 4492,\"maxExp\": 54},\"points\": {\"points\": 51,\"multi_place\": 1.6,\"multi_time\": 1,\"multi_special\": 1}}", PostResponse.class);
+//							intent.putExtra(PostResponse.PARAM_POSTRESPONSE, postResponse); 
+//							startActivity(intent);
+//							
+//						} catch (IOException e) {
+//							e.printStackTrace();
+//						}
 						
 					}
 				})
@@ -397,21 +419,26 @@ public class MainActivity extends Activity {
 		@Override
 		protected JsonResponse doInBackground(Integer... arg) {
 			Log.i("PostSoundMeasurement", "Begin Posting Measurment");
-
-			String url = "result/test/add/";	
-			url += arg[0];
-			bonus = arg[0];
-			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();
-			ObjectMapper objectMapper = new ObjectMapper();
+			SessionStorage sessionStorage = new SessionStorage(getApplicationContext());
+			String sessionId = sessionStorage.getSession();
+			if (sessionId != null) {
+				String url = "result/" + sessionId + "/add/";	
+				url += arg[0];
+				bonus = arg[0];
+				ServerConnection serverConnection = (ServerConnection) getApplication();
+				
+				ObjectMapper objectMapper = new ObjectMapper();
 
 
-			try {
-				jsonResponse = serverConnection.post(url);
-			} catch (IOException e) {
-				e.printStackTrace();
+				try {
+					jsonResponse = serverConnection.post(url);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				return jsonResponse;		
 			}
-			return jsonResponse;		
+			return jsonResponse;
 		}
 
 		@Override

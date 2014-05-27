@@ -25,6 +25,7 @@ import com.noisetube.main.ServerConnection;
 import com.noisetube.models.Points;
 import com.noisetube.models.PostResponse;
 import com.noisetube.models.Stats;
+import com.vub.storage.SessionStorage;
 import com.vub.storage.StatsStorage;
 
 public class PostResultActivity extends Activity {
@@ -106,20 +107,26 @@ public class PostResultActivity extends Activity {
 		@Override
 		protected JsonResponse doInBackground(Integer... arg) {
 			Log.i("PostSoundMeasurement", "Begin Posting Measurment");
-
-			String url = "result/test/add/";	
-			url += arg[0];
-			bonus = arg[0];
-			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();
-			ObjectMapper objectMapper = new ObjectMapper();
+			SessionStorage sessionStorage = new SessionStorage(getApplicationContext());
+			String sessionId = sessionStorage.getSession();
+			
+			if (sessionId != null) {
+				String url = "result/" + sessionId + "/add/";	
+				url += arg[0];
+				bonus = arg[0];
+				ServerConnection serverConnection = (ServerConnection) getApplication();
+				
+				ObjectMapper objectMapper = new ObjectMapper();
 
 
-			try {
-				jsonResponse = serverConnection.post(url);
-			} catch (IOException e) {
-				e.printStackTrace();
+				try {
+					jsonResponse = serverConnection.post(url);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
+			
 			return jsonResponse;		
 		}
 

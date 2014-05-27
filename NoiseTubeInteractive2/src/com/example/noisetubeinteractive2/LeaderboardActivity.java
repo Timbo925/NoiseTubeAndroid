@@ -12,7 +12,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
@@ -23,13 +23,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noisetube.adapters.LeaderboardAdapter;
 import com.noisetube.main.JsonResponse;
@@ -37,6 +33,7 @@ import com.noisetube.main.ServerConnection;
 import com.noisetube.models.LeaderboardEntry;
 import com.noisetube.models.LeaderboardType;
 import com.vub.storage.LeaderboardStorage;
+import com.vub.storage.SessionStorage;
 
 public class LeaderboardActivity extends Activity implements
 ActionBar.TabListener {
@@ -240,8 +237,18 @@ ActionBar.TabListener {
 			listView.setAdapter(adapter);
 
 			//TODO get session Id
-			GetLeaderboard loadLeaderboard = new GetLeaderboard();
-			loadLeaderboard.execute("leaderboard/test/", type.toString());
+			
+			
+			SessionStorage sessionStorage = new SessionStorage(getActivity());
+			String sessionId = sessionStorage.getSession();
+			if (sessionId != null) {
+				GetLeaderboard loadLeaderboard = new GetLeaderboard();
+				loadLeaderboard.execute("leaderboard/" + sessionId + "/", type.toString());
+			} else {
+				Intent intent = new Intent(getActivity(), LoginActivity.class);
+				startActivity(intent);
+			}
+			
 			
 			return rootView;
 		}

@@ -1,0 +1,4 @@
+json response 
+
+status = INFO
+message= List<String>

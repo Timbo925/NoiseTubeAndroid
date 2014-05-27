@@ -28,7 +28,9 @@ public class Poi implements Comparable<Poi>, Serializable {
 	@JsonIgnore
 	public List<Position> getPositions() {
 		List<Position> points = new ArrayList<Position>();
-		for (int i = 0; i < position.size()/2; i = i +2) {
+		//System.out.println("The Length: " + position.size());
+		for (int i = 0; i < position.size(); i += 2) {
+			//System.out.println("New POS");
 			points.add(new Position(position.get(i), position.get(i+1)));
 		}
 		return points;

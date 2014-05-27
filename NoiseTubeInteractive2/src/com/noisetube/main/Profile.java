@@ -83,4 +83,17 @@ public class Profile implements Serializable {
 		this.additionalProperties.put(name, value);
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "Profile [idUser=" + idUser + ", userName=" + userName
+				+ ", email=" + email + ", stats_idStats=" + stats_idStats
+				+ ", password=" + password + ", additionalProperties="
+				+ additionalProperties + "]";
+	}
+	
+	
+
 }

@@ -29,6 +29,7 @@ import com.noisetube.main.Profile;
 import com.noisetube.main.ServerConnection;
 import com.noisetube.models.Stats;
 import com.vub.storage.ProfileStorage;
+import com.vub.storage.SessionStorage;
 import com.vub.storage.StatsStorage;
 
 public class ProfileActivity extends Activity {
@@ -55,7 +56,9 @@ public class ProfileActivity extends Activity {
 		SharedPreferences storage = getSharedPreferences("prefs", 0);
 
 		if (!storage.contains(StatsStorage.PARAM_SAVE) || !storage.contains(ProfileStorage.PARAM_SAVE)) {
-			new GetProfile().execute("user/test");
+			SessionStorage sessionStorage = new SessionStorage(getApplicationContext());
+			String sessionId = sessionStorage.getSession();
+			new GetProfile().execute("user/" + sessionId);
 		} else {
 			ProfileStorage profileStorage = new ProfileStorage(getApplicationContext());
 			StatsStorage statsStorage = new StatsStorage(getApplicationContext());
@@ -83,7 +86,6 @@ public class ProfileActivity extends Activity {
 			JsonResponse jsonResponse = new JsonResponse();
 			try {
 				jsonResponse = serverConnection.get(arg[0]);
-
 			} catch (ClientProtocolException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
@@ -97,8 +99,8 @@ public class ProfileActivity extends Activity {
 		protected void onPostExecute(JsonResponse jsonResponse) { // Function has access to the UI treat
 
 			if (jsonResponse.hasErrors()) {
-				textProfileUserName.setText("Bob");
-				textProfileEmail.setText("Bob@gmail.com");
+				Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+				startActivity(intent);
 			} else {
 				ObjectMapper objectMapper = new ObjectMapper();
 				try {
