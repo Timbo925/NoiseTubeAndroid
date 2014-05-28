@@ -2,6 +2,7 @@ package com.noisetube.models;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -23,8 +24,21 @@ public class PostResponse implements Serializable{
 	private Stats stats;
 	@JsonProperty("points")
 	private Points points;
+	@JsonProperty("badges")
+	private List<Badge> badges;
+	
 	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
+	@JsonProperty("badges")
+	public List<Badge> getBadges() {
+		return badges;
+	}
+	
+	@JsonProperty("badges")
+	public void setBadges(List<Badge> b) {
+		this.badges = b;
+	}
+	
 	@JsonProperty("stats")
 	public Stats getStats() {
 	return stats;

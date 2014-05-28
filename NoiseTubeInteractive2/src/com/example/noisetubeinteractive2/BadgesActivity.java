@@ -1,12 +1,19 @@
 package com.example.noisetubeinteractive2;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,8 +25,14 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.noisetube.main.JsonResponse;
+import com.noisetube.main.ServerConnection;
 import com.noisetube.models.Badge;
 import com.noisetube.models.BadgeCompare;
+import com.vub.storage.BadgeStorage;
+import com.vub.storage.SessionStorage;
 
 public class BadgesActivity extends Activity {
 
@@ -59,8 +72,10 @@ public class BadgesActivity extends Activity {
 	 */
 	public static class BadgeFragment extends Fragment {
 
-		List<Badge> badges = new ArrayList<Badge>();
-
+		
+		ArrayAdapter<Badge> adapter;
+		ListView listView;
+		
 		@Override
 		public View onCreateView(LayoutInflater inflater, ViewGroup container,
 				Bundle savedInstanceState) {
@@ -73,39 +88,111 @@ public class BadgesActivity extends Activity {
 		}
 
 		private void populateListView(View rootView) {
-
-			// TODO retrieve correct users from the API (remove test data)
-			badges.add(new Badge("badge_1x", "First 1", "Successfully do a measurement", false));
-			badges.add(new Badge("badge_facebook", "Charing 2", "Post results to facebook", true));
-			badges.add(new Badge("badge_friendster", "Friends 3", "Ask your friends to join", true));
-			badges.add(new Badge("badge_google_like", "Liked 4", "Like us on Google+", true));
-			badges.add(new Badge("badge_friendster", "Friends 5", "Ask your friends to join", false));
-			badges.add(new Badge("badge_1x", "First 6", "Successfully do a measurement", false));
-			badges.add(new Badge("badge_facebook", "Charing 7", "Post results to facebook", true));
-			badges.add(new Badge("badge_google_like", "Liked 8", "Like us on Google+", true));
-			System.out.println(badges);
-
-			Collections.sort(badges, new BadgeCompare());
-
-			System.out.println(badges);
-			// Build Adapter with custom view reslolver
-
-			ArrayAdapter<Badge> adapter = new MyListAdapter();
-
+			//Load Badges
+			UpdateBadges updateBadges = new UpdateBadges();
+			updateBadges.execute();
+			
+			BadgeStorage badgeStorage = new BadgeStorage(getActivity());
+			List<Badge> badges = new ArrayList<Badge>();
+			badges = badgeStorage.getBadgeList();
+			
+			if (badges != null) {		
+				Collections.sort(badges, new BadgeCompare());
+				System.out.println("From Storage: " + badges);	
+			} 
+			
+			// Build Adapter with custom view resolver
+			adapter = new MyListAdapter(getActivity().getApplicationContext(),badges);
+			
 			//Configure the list view
-			ListView listView = (ListView)  rootView.findViewById(R.id.badges_list);
+			listView = (ListView)  rootView.findViewById(R.id.badges_list);
 			listView.setAdapter(adapter);
+			
+		}
+		
+		private class UpdateBadges extends AsyncTask<Void, Void, List<Badge>> {
+			
+			boolean changed = false;
+			
+			@Override
+			protected List<Badge> doInBackground(Void... params) {
+				try {
+					ServerConnection serverConnection = (ServerConnection) getActivity().getApplication();
+					SessionStorage sessionStorage = new SessionStorage(getActivity());
+					BadgeStorage badgeStorage = new BadgeStorage(getActivity());
+					String session = sessionStorage.getSession();
+					changed = false;
+					if (session != null) {
+						JsonResponse jsonResponse = serverConnection.get("badge");
+						JsonResponse jsonResponse2 = serverConnection.get("badge/" + session);
+						System.out.println(jsonResponse.toString());
+						System.out.println(jsonResponse2.toString());
+						
+						if (!jsonResponse.hasErrors()) {
+							ObjectMapper mapper = new ObjectMapper();
+							List<Badge> badges2 = mapper.readValue(jsonResponse.getMessage(), new TypeReference<List<Badge>>(){});
+							JSONObject json = new JSONObject(jsonResponse2.getMessage());
+							List<Integer> achievedList = new ArrayList<Integer>();
+							
+							JSONArray jsonArray = json.getJSONArray("badges");
+							
+							for (int i = 0; i< jsonArray.length(); i++) {
+								achievedList.add(jsonArray.getInt(i));
+							}
+							
+							for (Badge b : badges2) {
+								if (achievedList.contains(b.getIdBadge())) {
+									b.setAchieved(true);
+								}
+							}
+							
+							badgeStorage.setBadgeList(badges2);
+							//badges = badges2;
+							
+							changed = true;
+							
+							System.out.println(badges2.toString());
+							System.out.println(achievedList);
+							
+							return badges2;
+						}
+						
+					} 
+					
+				} catch (ClientProtocolException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				
+				return null;
+			}
+			
+			@Override
+			protected void onPostExecute(List<Badge> badges) {
+				super.onPostExecute(badges);
+				if (changed) {
+					System.out.println("Lengt On Post Execute:" + badges.size());
+					adapter.clear();
+					System.out.println("Cleared adapter");
+					adapter.addAll(badges);
+					//adapter.notifyDataSetChanged();
+				}
+			}
 		}
 
 		private class MyListAdapter extends ArrayAdapter<Badge> {
-			public MyListAdapter() {
+			public MyListAdapter(Context context, List<Badge> badges) {
 				super(getActivity(), R.layout.fragment_badges_list_item, badges);
+				System.out.println("Size in Adapter Constructor: " + badges.size());
 			}
 
 			@Override
 			public View getView(int position, View convertView, ViewGroup parent) {
 
-				// Make sure we have a view to inflate because for the fist element we dont have this view
+				// Make sure we have a view to inflate because for the fist element we don't have this view
 				View itemView = convertView;
 				if (itemView == null) {
 					LayoutInflater inflater = (LayoutInflater) getActivity().getSystemService( Context.LAYOUT_INFLATER_SERVICE );
@@ -113,7 +200,7 @@ public class BadgesActivity extends Activity {
 				}
 
 				//Selecting correct user from the arraylist
-				Badge badge = badges.get(position); 
+				Badge badge = getItem(position); 
 
 				//Filling the view
 				TextView textName = (TextView) itemView.findViewById(R.id.badge_name);

@@ -1,7 +1,12 @@
 package com.noisetube.models;
 
 import java.io.Serializable;
-import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.fasterxml.jackson.annotation.JsonAnyGetter;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Representation of a badge in listView
@@ -10,85 +15,106 @@ import java.util.Comparator;
  */
 public class Badge implements Serializable {
 
+	private static final long serialVersionUID = 2855015009572643325L;
+	private boolean achieved = false;
+	@JsonProperty("idBadge")
+	private Integer idBadge;
+	@JsonProperty("name")
+	private String name;
+	@JsonProperty("description")
+	private String description;
+	@JsonProperty("challange")
+	private String challange;
+	@JsonProperty("icon")
+	private String icon;
+	private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+
+	public Badge() {
+		
+	}
+	public Badge(boolean achieved, Integer idBadge, String name, String description, String challange, String icon) {
+		super();
+		this.achieved = achieved;
+		this.idBadge = idBadge;
+		this.name = name;
+		this.description = description;
+		this.challange = challange;
+		this.icon = icon;
+	}
+	
+
 	@Override
 	public String toString() {
-		return "Badge [icon=" + icon + ", name=" + name + ", description="
-				+ description + ", achieved=" + achieved + "]";
+		return "Badge [achieved=" + achieved + ", idBadge=" + idBadge
+				+ ", name=" + name + ", description=" + description
+				+ ", challange=" + challange + ", icon=" + icon + "]";
 	}
-
-	private static final long serialVersionUID = 1L;
-	private String icon;
-	private String name;
-	private String description;
-	private boolean achieved;
-
-	/**
-	 * @param icon - icon name in drawables
-	 * @param name - name of the icon
-	 * @param description - dadge description
-	 */
-	public Badge(String icon, String name, String description, boolean achieved) {
-		super();
-		this.icon = icon;
-		this.name = name;
-		this.description = description;
-		this.achieved = achieved;
-	}
-
-	/**
-	 * @return the icon
-	 */
-	public String getIcon() {
-		return icon;
-	}
-
-	/**
-	 * @param icon the icon to set
-	 */
-	public void setIcon(String icon) {
-		this.icon = icon;
-	}
-
-	/**
-	 * @return the name
-	 */
-	public String getName() {
-		return name;
-	}
-
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	/**
-	 * @return the description
-	 */
-	public String getDescription() {
-		return description;
-	}
-
-	/**
-	 * @param description the description to set
-	 */
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
-	/**
-	 * @return the achieved
-	 */
 	public boolean isAchieved() {
 		return achieved;
 	}
 
-	/**
-	 * @param achieved the achieved to set
-	 */
 	public void setAchieved(boolean achieved) {
 		this.achieved = achieved;
+	}
+
+	@JsonProperty("idBadge")
+	public Integer getIdBadge() {
+	return idBadge;
+	}
+
+	@JsonProperty("idBadge")
+	public void setIdBadge(Integer idBadge) {
+	this.idBadge = idBadge;
+	}
+
+	@JsonProperty("name")
+	public String getName() {
+	return name;
+	}
+
+	@JsonProperty("name")
+	public void setName(String name) {
+	this.name = name;
+	}
+
+	@JsonProperty("description")
+	public String getDescription() {
+	return description;
+	}
+
+	@JsonProperty("description")
+	public void setDescription(String description) {
+	this.description = description;
+	}
+
+	@JsonProperty("challange")
+	public String getChallange() {
+	return challange;
+	}
+
+	@JsonProperty("challange")
+	public void setChallange(String challange) {
+	this.challange = challange;
+	}
+
+	@JsonProperty("icon")
+	public String getIcon() {
+	return icon;
+	}
+
+	@JsonProperty("icon")
+	public void setIcon(String icon) {
+	this.icon = icon;
+	}
+
+	@JsonAnyGetter
+	public Map<String, Object> getAdditionalProperties() {
+	return this.additionalProperties;
+	}
+
+	@JsonAnySetter
+	public void setAdditionalProperty(String name, Object value) {
+	this.additionalProperties.put(name, value);
 	}
 
 }
