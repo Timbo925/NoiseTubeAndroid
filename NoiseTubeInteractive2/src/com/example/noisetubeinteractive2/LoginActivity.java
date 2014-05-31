@@ -33,7 +33,7 @@ public class LoginActivity extends Activity {
 	 * The default email to populate the email field with.
 	 */
 	public static final String EXTRA_EMAIL = "com.example.android.authenticatordemo.extra.EMAIL";
-
+	private boolean login = false;
 	/**
 	 * Keep track of the login task to ensure we can cancel it if requested.
 	 */
@@ -83,6 +83,7 @@ public class LoginActivity extends Activity {
 				new View.OnClickListener() {
 					@Override
 					public void onClick(View view) {
+						login = true;
 						attemptLogin();
 					}
 				});
@@ -92,6 +93,8 @@ public class LoginActivity extends Activity {
 					
 					@Override
 					public void onClick(View v) {
+						login = false;
+						attemptLogin();
 						System.out.println("TO REGISTER");
 					}
 				});
@@ -136,7 +139,6 @@ public class LoginActivity extends Activity {
 			cancel = true;
 		}
 
-		// Check for a valid email address.
 		if (TextUtils.isEmpty(mUserName)) {
 			mUserNameView.setError(getString(R.string.error_field_required));
 			focusView = mUserNameView;
@@ -215,7 +217,13 @@ public class LoginActivity extends Activity {
 			// TODO: attempt authentication against a network service.
 
 			ServerConnection serverConnection = (ServerConnection) getApplicationContext();
-			JsonResponse jsonResponse = serverConnection.post("user/login", "{\"username\" : \"" + mUserName + "\" , \"password\" : \"" + mPassword + "\"}");
+			JsonResponse jsonResponse = new JsonResponse();
+			if (login) {
+				jsonResponse = serverConnection.post("user/login", "{\"username\" : \"" + mUserName + "\" , \"password\" : \"" + mPassword + "\"}");	
+			} else {
+				jsonResponse = serverConnection.post("user/create", "{\"username\" : \"" + mUserName + "\" , \"password\" : \"" + mPassword + "\"}");
+			}
+			
 			System.out.println(jsonResponse);
 			
 			if (jsonResponse.hasErrors()) {

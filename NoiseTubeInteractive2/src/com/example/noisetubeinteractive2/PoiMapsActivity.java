@@ -48,7 +48,7 @@ public class PoiMapsActivity extends Activity {
 					
 					CircleOptions co = new CircleOptions();
 					co.center(new LatLng(poi.getPositions().iterator().next().getX(), poi.getPositions().iterator().next().getY()));
-					co.radius(poi.getRadius() * 100);
+					co.radius(poi.getRadius() * 1000);
 					co.strokeColor(0x40333EE8);
 					co.fillColor(0x20333EE8);
 					map.addCircle(co);

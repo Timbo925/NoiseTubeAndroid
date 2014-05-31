@@ -318,8 +318,7 @@ public class MainActivity extends Activity {
 		@Override
 		protected JsonResponse doInBackground(Void... arg) {
 			Log.i("PostSoundMeasurement", "Begin Posting Measurment");
-
-			String url = "result/test/1";		
+	
 			ServerConnection serverConnection = (ServerConnection) getApplication();
 			JsonResponse jsonResponse = new JsonResponse();
 			ObjectMapper objectMapper = new ObjectMapper();
@@ -329,7 +328,7 @@ public class MainActivity extends Activity {
 			if (sessionId != null) {
 				try {
 					Log.d("PostSoundMeasurment", objectMapper.writeValueAsString(postRequest));
-					jsonResponse = serverConnection.post(url, objectMapper.writeValueAsString(postRequest));
+					jsonResponse = serverConnection.post("result/" + sessionId + "/1", objectMapper.writeValueAsString(postRequest));
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
